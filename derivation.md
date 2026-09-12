@@ -159,3 +159,44 @@ the sweep: `λ_min → 0` as α → 0, and at α=0 the exponential law is replac
 a power law. The same formula reproduces Experiment 1's collapse-time
 constant: from `u_0 = 0.1` to `p_1 = 0.99` (`u = ln 99`) it gives
 `t = 53.89/Δ`, against the fitted `53.94 · Δ^{-1.00}`.
+
+## Finite group size: the correction ceiling (Experiment 2, Fig. 4)
+
+The sampled update (`rhs_sampled`) rescales with the group frequency
+`p̂_i`, where `G p̂_i ~ Binomial(G, p_i)`:
+
+```
+ĝ_i = r_i p̂_i max(p̂_i, ε)^{-α}  -  p_i Σ_k r_k p̂_k max(p̂_k, ε)^{-α}
+```
+
+Its mean replaces `p_i^{1-α}` by `φ_G(p_i) := E[p̂ max(p̂, ε)^{-α}]`, so the
+mean dynamics are stationary when `r_i w_G(p_i) = const` with the
+**effective inverse-probability weight** `w_G(p) := φ_G(p)/p`
+(ideal: `w_∞(p) = p^{-α}`). `w_G` has two limits:
+
+- `p → 1`: `p̂ → 1`, so `w_G → 1`.
+- `p → 0`: only a single hit matters, `P(n=1) ≈ Gp` at `p̂ = 1/G`, so
+  `φ_G(p) ≈ Gp · (1/G) · max(1/G, ε)^{-α}` and
+
+```
+w_G(p) → min(G, 1/ε)^α      (the largest boost a finite group can apply)
+```
+
+For K=2 with `r_1 > r_2`, as `p_2 → 0` the logit gap drifts at a rate
+proportional to `r_1 w_G(p_1) - r_2 w_G(p_2) → r_1 - r_2 min(G, 1/ε)^α`. If
+that is positive, `p_2` keeps shrinking, so the minority outcome survives
+only if
+
+```
+α > α_c = ln(r_1 / r_2) / ln min(G, 1/ε)
+```
+
+For r=(4,1) and ε=1e-3: `α_c = 1` at G=4, `0.5` at G=16, `1/3` at G=64. Even
+the paper's α=1 needs `G > r_1/r_2` to protect the weaker outcome. The exact
+finite-G stationary point (the root of `r_1 w_G(p) = r_2 w_G(1-p)`, by
+bisection) is `src/finite_group.py::meanfield_stationary_K2`.
+
+A side remark: when `ε < 1/G`, the clip never activates (`p̂` is either 0 or
+≥ 1/G), so results cannot depend on ε there. That is consistent with the
+paper's Table 4, where the entries for G=4 (all ε) and for G=8 (ε = 0.01 and
+0.1) are identical.
