@@ -71,3 +71,12 @@ project — state is always just a K-length logit vector.
 `results/*/data/*.csv` is gitignored (not pushed) for now, but **everyone
 should keep their own generated CSVs locally, not delete them** — we'll
 need those trajectories later for large-scale runs.
+
+## Note: `rhs_sampled` fix (made with Experiment 2)
+
+`src/dynamics.py::rhs_sampled` used to give an outcome that did not appear
+in the group (`p_hat = 0`) a spurious weight `r * eps^(1-alpha)` instead of 0.
+That is negligible at alpha=0 (~1e-3) but enormous for alpha > 1 (1000·r at
+alpha=2). It is fixed now. Experiment 1's committed figures predate the fix; a
+full re-run with the fix leaves every Exp. 1 conclusion unchanged (details in
+`RESULTS_exp2.md`). Use the fixed version for any new Monte-Carlo experiment.
