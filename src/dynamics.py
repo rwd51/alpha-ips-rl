@@ -112,12 +112,17 @@ def rhs_sampled(z: np.ndarray, r: np.ndarray, alpha: float, G: int,
 
         r_tilde_i   = r_i / max(p_hat_i, eps)^alpha
         ghat_i      = p_hat_i * r_tilde_i  -  p_i * sum_k p_hat_k * r_tilde_k
-                    = r_i * p_hat_i^(1-alpha)  -  p_i * sum_k r_k * p_hat_k^(1-alpha)
 
     which reduces to the correct unbiased batched-REINFORCE estimator when
     alpha=0, and to the paper's Eq. (9) frequency-clipped IPS when alpha=1.
+    An outcome absent from the group (p_hat_i = 0) contributes nothing to the
+    first term -- the algorithm has no sample of it to rescale. (Shortening
+    p_hat * max(p_hat, eps)^-alpha to max(p_hat, eps)^(1-alpha) is only valid
+    for p_hat >= eps; at p_hat = 0 it would hand every unseen outcome a
+    spurious weight r * eps^(1-alpha), e.g. 1000*r for alpha=2, eps=1e-3.)
 
     z : (S, K) logits, S independent seeds
+    alpha : float, or (S, 1) array to sweep alpha across the batch
     Returns ghat : (S, K), the stochastic update direction (to be used as
     z <- z + h * ghat, a single SGD-style step -- NOT integrated with RK4,
     since this is a noisy discrete training step, not a smooth ODE).
@@ -129,8 +134,7 @@ def rhs_sampled(z: np.ndarray, r: np.ndarray, alpha: float, G: int,
     idx = inverse_transform_sample_batch(p, G, rng)
     counts = empirical_counts(idx, K)
     p_hat = counts / G
-    p_hat_c = np.clip(p_hat, eps, 1.0)
-    w = r[None, :] * p_hat_c ** (1.0 - alpha)   # (S,K)
+    w = r[None, :] * p_hat * np.clip(p_hat, eps, 1.0) ** (-alpha)   # (S,K)
     S_sum = np.sum(w, axis=-1, keepdims=True)
     ghat = w - p * S_sum
     return ghat, p_hat
