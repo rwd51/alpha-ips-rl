@@ -1,7 +1,6 @@
 __pycache__/
 *.pyc
 
-# generated outputs -- not pushed yet
-results/*/figures/*.png
+# generated data tables -- not pushed yet (figures ARE pushed)
 results/*/data/*.csv
 results/*/data/*.json
