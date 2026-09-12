@@ -62,3 +62,9 @@ python3 experiments/exp1_collapse.py
 Each experiment script is self-contained and runnable the same way. No
 GPU, neural networks, or external RL library is needed anywhere in this
 project — state is always just a K-length logit vector.
+
+## Important: keep your local CSVs
+
+`results/*/data/*.csv` is gitignored (not pushed) for now, but **everyone
+should keep their own generated CSVs locally, not delete them** — we'll
+need those trajectories later for large-scale runs.
