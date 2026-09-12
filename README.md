@@ -10,16 +10,19 @@ for the write-up of each experiment's results.
 
 ```
 src/                        shared core library, used by ALL experiments
-  dynamics.py                softmax, ODE right-hand side, Monte-Carlo sampler
-  integrators.py              Euler / RK4 / event-time detection
+  dynamics.py                softmax, ODE right-hand side, Monte-Carlo sampler,
+                               Jacobian / linear rates at the stationary point
+  integrators.py              Euler / RK4 / event-time detection / log-spaced recording
   fitting.py                   least-squares line fit
+  rootfinding.py               bisection (scalar, and vectorized boundary search)
+  finite_group.py              finite-G mean-field theory of the sampled update
   plotstyle.py                  shared Nature-journal-like matplotlib style
-  (add new shared modules here, e.g. rootfinding.py, hypergrid.py — never
+  (add new shared modules here, e.g. hypergrid.py — never
    duplicate logic inside an experiments/ script)
 
 experiments/
   exp1_collapse.py            one file per experiment: exp<N>_<short_name>.py
-  exp2_ips_alpha_sweep.py     (next)
+  exp2_ips_alpha_sweep.py     alpha sweep: diversity knob, rates, stiffness, MC
   exp3_rootfinding.py         (planned)
   exp4_hypergrid.py           (planned)
   exp5_bias_variance.py       (planned)
