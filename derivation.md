@@ -91,3 +91,71 @@ demonstrates: starting from an **exactly symmetric** initial policy
 collapses, purely from sampling noise, onto an outcome chosen uniformly at
 random (Fig. 2a-b), and larger Monte-Carlo group sizes `G` (less sampling
 noise) measurably delay this collapse (Fig. 2c).
+
+## Linearization at the stationary point (Experiment 2)
+
+Perturb the logits around `z* = log p*`. With the softmax derivative
+`C = diag(p) - p pᵀ`, a logit perturbation moves the probabilities by
+`δp = C δz`. At `p*` every outcome shares the same value
+
+```
+r_i / p*_i^α = c = ‖r‖_{1/α} := (Σ_k r_k^{1/α})^α      (since p*_i = r_i^{1/α} / Σ_k r_k^{1/α})
+```
+
+and `S* = Σ_k r_k p*_k^{1-α} = c Σ_k p*_k = c`. Perturbing each piece of (*):
+
+```
+δ(r_i p_i^{1-α}) = (1-α) r_i p_i^{-α} δp_i = (1-α) c δp_i
+δS              = Σ_k (1-α) c δp_k        = 0          (probabilities sum to 1)
+δ(p_i S)        = S* δp_i + p*_i δS        = c δp_i
+```
+
+so `δż_i = (1-α) c δp_i - c δp_i = -α c δp_i`, i.e.
+
+```
+J* = -α ‖r‖_{1/α} (diag(p*) - p* p*ᵀ)
+```
+
+(`src/dynamics.py::stationary_jacobian`; it agrees with the general
+analytical Jacobian `jacobian_alpha` evaluated at `z*` to ~1e-16.) `J*` is
+symmetric negative semidefinite with one zero eigenvalue along `1` (shifting
+every logit leaves `p` unchanged). The other K-1 eigenvalues are the
+**linear rates** `λ_j = α ‖r‖_{1/α} μ_j`, where the `μ_j` are the nonzero
+eigenvalues of `Cov(p*) = diag(p*) - p* p*ᵀ`.
+
+Special cases:
+
+- **α=1:** `J* = -R Cov(p*)`, consistent with the paper's `ż = R(p* - p)`.
+- **K=2:** `μ = 2 p* q*`, so `λ = 2α ‖r‖_{1/α} p* q*` (r=(4,1), α=1: λ = 2·5·0.8·0.2 = 1.6).
+- **Exact tie** (all `r_i = r̄`): `p*` is uniform, `‖r‖_{1/α} = r̄ K^α`, and every
+  `μ_j = 1/K`, so `λ = α r̄ K^{α-1}` (K-1 fold).
+
+What this predicts:
+
+- `‖p(t) - p*‖ ~ exp(-λ_min t)` asymptotically.
+- An explicit scheme is linearly stable only for `h λ_max < 2` (Euler) or
+  `h λ_max < 2.7853` (RK4: the real-axis root of `R(-x) = 1` for
+  `R(z) = 1 + z + z²/2 + z³/6 + z⁴/24`, i.e. of `x³ - 4x² + 12x - 24 = 0`).
+- **Large α is stiff:** `‖r‖_{1/α}` grows like `K^α`, so `λ_max` grows
+  exponentially in α. For α > 1 the right-hand side is also no longer bounded
+  (`r p^{1-α}` blows up as `p → 0`), which is why Experiment 1 (α=0, bounded
+  RHS) could not find an Euler instability but Experiment 2 can.
+- **Small α is slow:** for K=2, `q* ≈ (r_2/r_1)^{1/α}`, so
+  `λ ≈ 2α r_1 (r_2/r_1)^{1/α}`, which vanishes faster than any power of α.
+
+## α = 0: algebraic, not exponential, convergence
+
+For K=2 let `u = z_1 - z_2` and `Δ = r_1 - r_2 > 0`. With α=0, (*) gives
+`u̇ = 2pqΔ = Δ / (1 + cosh u)`, which integrates exactly to
+
+```
+(u + sinh u) - (u_0 + sinh u_0) = Δ t .
+```
+
+For large u, `sinh u ≈ e^u / 2`, so `p_2 = 1/(1 + e^u) ≈ 1/(2Δt)`: the policy
+reaches its boundary equilibrium only algebraically, like `t^{-1}`, with no
+exponential rate. This makes α=0 a singular limit rather than just the end of
+the sweep: `λ_min → 0` as α → 0, and at α=0 the exponential law is replaced by
+a power law. The same formula reproduces Experiment 1's collapse-time
+constant: from `u_0 = 0.1` to `p_1 = 0.99` (`u = ln 99`) it gives
+`t = 53.89/Δ`, against the fitted `53.94 · Δ^{-1.00}`.

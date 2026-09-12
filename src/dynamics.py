@@ -35,6 +35,9 @@ This module provides:
     what "training" actually looks like: no ODE integrator is applied to it,
     a single stochastic gradient step is taken per iteration, exactly as SGD/
     policy-gradient training does.
+  - stationary_p, reward_norm, jacobian_alpha, stationary_jacobian,
+    linear_rates: the stationary law p* ~ r^(1/alpha) and the linearization
+    around it (convergence rates, explicit step-size limits; Experiment 2).
 """
 
 from __future__ import annotations
@@ -148,5 +151,48 @@ def stationary_p(r: np.ndarray, alpha: float) -> np.ndarray:
         out = np.zeros_like(r)
         out[r == r.max()] = 1.0 / np.sum(r == r.max())
         return out
-    w = r ** (1.0 / alpha)
+    w = (r / r.max()) ** (1.0 / alpha)   # normalize first: r^(1/alpha) overflows for small alpha
     return w / np.sum(w)
+
+
+def reward_norm(r: np.ndarray, alpha: float) -> float:
+    """||r||_{1/alpha} = (sum_k r_k^(1/alpha))^alpha -- the common value of
+    r_i / p*_i^alpha shared by every outcome at the stationary point."""
+    r = np.asarray(r, dtype=np.float64)
+    r_max = r.max()
+    return float(r_max * np.sum((r / r_max) ** (1.0 / alpha)) ** alpha)
+
+
+def jacobian_alpha(z: np.ndarray, r: np.ndarray, alpha: float, p_floor: float = 1e-12) -> np.ndarray:
+    """
+    Analytical Jacobian J_ij = d f_i / d z_j of rhs_alpha at a single state z (K,).
+
+    With C = diag(p) - p p^T (the softmax derivative dp/dz),
+    D = diag((1-alpha) r_i p_i^-alpha) and S = sum_k r_k p_k^(1-alpha):
+
+        J = (I - p 1^T) D C  -  S C
+
+    J @ 1 = 0 always (shifting every logit leaves p unchanged).
+    """
+    z = np.asarray(z, dtype=np.float64)
+    r = np.asarray(r, dtype=np.float64)
+    p = softmax(z)
+    p_c = np.clip(p, p_floor, 1.0)
+    C = np.diag(p) - np.outer(p, p)
+    DC = ((1.0 - alpha) * r * p_c ** (-alpha))[:, None] * C
+    S = np.sum(r * p_c ** (1.0 - alpha))
+    return DC - np.outer(p, DC.sum(axis=0)) - S * C
+
+
+def stationary_jacobian(r: np.ndarray, alpha: float) -> np.ndarray:
+    """Closed form of jacobian_alpha at p* (derivation.md, "Linearization"):
+        J* = -alpha * ||r||_{1/alpha} * (diag(p*) - p* p*^T)."""
+    ps = stationary_p(r, alpha)
+    return -alpha * reward_norm(r, alpha) * (np.diag(ps) - np.outer(ps, ps))
+
+
+def linear_rates(r: np.ndarray, alpha: float) -> np.ndarray:
+    """The K-1 nonzero eigenvalues of -J*, ascending (alpha > 0). rates[0] is the
+    asymptotic exponential rate of ||p(t) - p*||; rates[-1] sets the largest
+    stable step size of an explicit integrator."""
+    return np.linalg.eigvalsh(-stationary_jacobian(r, alpha))[1:]

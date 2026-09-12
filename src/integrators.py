@@ -75,3 +75,29 @@ def time_to_event(f: Callable[[np.ndarray], np.ndarray], z0: np.ndarray, h: floa
         if event(z):
             return t
     return None
+
+
+def integrate_at(f: Callable[[np.ndarray], np.ndarray], z0: np.ndarray, h: float,
+                 record_steps, method: str = "rk4"):
+    """
+    Integrate z_dot = f(z) from z0 with fixed step h, recording z only at the
+    given step indices (0 = z0) -- e.g. log-spaced indices, to plot a
+    trajectory on a log time axis across many decades without storing every
+    step.
+
+    Returns
+    -------
+    ts   : (n_recorded,) time stamps
+    traj : (n_recorded, S, K) trajectory of z
+    """
+    step = _STEPPERS[method]
+    record_steps = np.unique(np.asarray(record_steps, dtype=np.int64))
+    z = np.array(z0, dtype=np.float64, copy=True)
+    traj = []
+    n = 0
+    for target in record_steps:
+        while n < target:
+            z = step(f, z, h)
+            n += 1
+        traj.append(z.copy())
+    return record_steps * h, np.array(traj)
