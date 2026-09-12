@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+
+# generated outputs -- not pushed yet
+results/*/figures/*.png
+results/*/data/*.csv
+results/*/data/*.json
