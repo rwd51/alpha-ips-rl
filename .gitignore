@@ -4,3 +4,4 @@ __pycache__/
 # generated data tables -- not pushed yet (figures ARE pushed)
 results/*/data/*.csv
 results/*/data/*.json
+
