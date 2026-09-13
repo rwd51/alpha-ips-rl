@@ -76,8 +76,7 @@ shape of $w_G(p)$ still depends on $G$, $\alpha$, and $\varepsilon$.
 The ceiling base is
 
 $$
-\min\{G,\frac{1}{\varepsilon}\}
-=
+\min\{G,\frac{1}{\varepsilon}\}=
 \begin{cases}
 G, & \varepsilon\leq \dfrac{1}{G}, \\
 \dfrac{1}{\varepsilon}, & \varepsilon>\dfrac{1}{G}.
