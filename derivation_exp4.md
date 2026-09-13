@@ -20,14 +20,14 @@ $\widehat p=N/G$. The expected sampled weight and its size-biased version are
 $$
 \begin{aligned}
 \phi_G(p)
-  &= \mathbb{E}\!\left[
-       \widehat p\,\max\!\left\{\widehat p,\varepsilon\right\}^{-\alpha}
-     \right], \\
+  &= \mathbb{E}[
+       \widehat p\,\max\{\widehat p,\varepsilon\}^{-\alpha}
+     ], \\
 w_G(p)
   &= \frac{\phi_G(p)}{p} \\
-  &= \mathbb{E}\!\left[
-       \max\!\left\{\frac{1+B}{G},\varepsilon\right\}^{-\alpha}
-     \right],
+  &= \mathbb{E}[
+       \max\{\frac{1+B}{G},\varepsilon\}^{-\alpha}
+     ],
 \qquad B\sim\mathrm{Binomial}(G-1,p).
 \end{aligned}
 $$
@@ -37,7 +37,7 @@ The size-biased form is well defined at the boundary:
 $$
 w_G(1)=1,
 \qquad
-w_G(0)=\min\!\left\{G,\frac{1}{\varepsilon}\right\}^{\alpha}
+w_G(0)=\min\{G,\frac{1}{\varepsilon}\}^{\alpha}
 \equiv C_G.
 $$
 
@@ -55,14 +55,14 @@ when
 $$
 C_G>\rho
 \quad\Longleftrightarrow\quad
-\alpha\log\!\min\!\left\{G,\frac{1}{\varepsilon}\right\}>\log\rho.
+\alpha\log\min\{G,\frac{1}{\varepsilon}\}>\log\rho.
 $$
 
 Experiment 4 uses the signed distance
 
 $$
 m(\alpha,G,\varepsilon,\rho)
-=\alpha\log\!\min\!\left\{G,\frac{1}{\varepsilon}\right\}-\log\rho.
+=\alpha\log\min\{G,\frac{1}{\varepsilon}\}-\log\rho.
 $$
 
 $m>0$ means the minority outcome survives; $m\leq0$ means the finite-group mean
@@ -76,7 +76,7 @@ shape of $w_G(p)$ still depends on $G$, $\alpha$, and $\varepsilon$.
 The ceiling base is
 
 $$
-\min\!\left\{G,\frac{1}{\varepsilon}\right\}
+\min\{G,\frac{1}{\varepsilon}\}
 =
 \begin{cases}
 G, & \varepsilon\leq \dfrac{1}{G}, \\
@@ -109,10 +109,10 @@ scale-free residual
 
 $$
 \frac{1}{|S|}
-\max\!\left\{
-  \max_{i:\,p_i>0}\left|r_iw_G(p_i)-S\right|,
-  \max_{i:\,p_i=0}\left[r_iw_G(0)-S\right]_+
-\right\},
+\max\{
+  \max_{i:\,p_i>0}|r_iw_G(p_i)-S|,
+  \max_{i:\,p_i=0}[r_iw_G(0)-S]_+
+\},
 \qquad [x]_+\equiv\max\{x,0\}.
 $$
 
@@ -121,7 +121,7 @@ The two plotted diversity summaries are
 $$
 \begin{aligned}
 \text{support size}
-  &= \#\left\{i:p_i>10^{-11}\right\}, \\
+  &= \#\{i:p_i>10^{-11}\}, \\
 \text{normalized entropy}
   &= -\frac{\sum_i p_i\log p_i}{\log K}.
 \end{aligned}
@@ -131,7 +131,7 @@ For the minimum-group-size grid, rewards follow a geometric profile with a
 specified endpoint spread $R=r_{\max}/r_{\min}$:
 
 $$
-r_i=\exp\!\left(-\frac{i\log R}{K-1}\right),
+r_i=\exp(-\frac{i\log R}{K-1}),
 \qquad i=0,\ldots,K-1.
 $$
 
@@ -144,7 +144,7 @@ still numerical: it uses the declared $10^{-11}$ probability tolerance.
 The surrogate grid uses
 
 $$
-\mathbf{x}=\left(\log\alpha,\log\rho,\log\varepsilon\right)
+\mathbf{x}=(\log\alpha,\log\rho,\log\varepsilon)
 $$
 
 at fixed $G=16$. Log coordinates are appropriate because all three parameters

@@ -35,8 +35,8 @@ The minority outcome should survive exactly when
 
 $$
 m
-=\alpha\log\!\min\!\left\{G,\frac{1}{\varepsilon}\right\}
--\log\!\left(\frac{r_1}{r_2}\right)>0.
+=\alpha\log\min\{G,\frac{1}{\varepsilon}\}
+-\log(\frac{r_1}{r_2})>0.
 $$
 
 ### Numerical checks
