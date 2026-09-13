@@ -120,7 +120,7 @@ The two plotted diversity summaries are
 $$
 \begin{aligned}
 \text{support size}
-  &= \#\{i:p_i>10^{-11}\}, \\
+  &= \mathrm{card}\{i:p_i>10^{-11}\}, \\
 \text{normalized entropy}
   &= -\frac{\sum_i p_i\log p_i}{\log K}.
 \end{aligned}
