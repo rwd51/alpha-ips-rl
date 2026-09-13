@@ -16,6 +16,7 @@ src/                        shared core library, used by ALL experiments
   fitting.py                   least-squares line fit
   rootfinding.py               bisection (scalar, and vectorized boundary search)
   finite_group.py              finite-G mean-field theory of the sampled update
+  hypergrid.py                 tensor grids, multilinear interpolation, batched K=2 solver
   plotstyle.py                  shared Nature-journal-like matplotlib style
   (add new shared modules here, e.g. hypergrid.py — never
    duplicate logic inside an experiments/ script)
@@ -24,7 +25,7 @@ experiments/
   exp1_collapse.py            one file per experiment: exp<N>_<short_name>.py
   exp2_ips_alpha_sweep.py     alpha sweep: diversity knob, rates, stiffness, MC
   exp3_rootfinding.py         (planned)
-  exp4_hypergrid.py           (planned)
+  exp4_hypergrid.py           multidimensional finite-G atlas and interpolation audit
   exp5_bias_variance.py       (planned)
 
 results/
@@ -40,6 +41,7 @@ RESULTS_exp1.md               one write-up per experiment, at repo root
 RESULTS_exp2.md               (same naming: RESULTS_exp<N>.md)
 ...
 derivation.md                  shared math derivations (append new sections here)
+derivation_exp4.md             Experiment 4 hypergrid and interpolation derivations
 ```
 
 Rule of thumb when adding experiment N: create `experiments/exp<N>_<name>.py`,
