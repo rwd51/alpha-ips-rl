@@ -14,7 +14,7 @@ unit.
 ## 1. Exact finite-group boundary for $K=2$
 
 For outcome probability $p$, a group of $G$ independent samples gives
-$N\sim\operatorname{Binomial}(G,p)$ and empirical frequency
+$N\sim\mathrm{Binomial}(G,p)$ and empirical frequency
 $\widehat p=N/G$. The expected sampled weight and its size-biased version are
 
 $$
@@ -28,7 +28,7 @@ w_G(p)
   &= \mathbb{E}\!\left[
        \max\!\left\{\frac{1+B}{G},\varepsilon\right\}^{-\alpha}
      \right],
-\qquad B\sim\operatorname{Binomial}(G-1,p).
+\qquad B\sim\mathrm{Binomial}(G-1,p).
 \end{aligned}
 $$
 
@@ -38,7 +38,7 @@ $$
 w_G(1)=1,
 \qquad
 w_G(0)=\min\!\left\{G,\frac{1}{\varepsilon}\right\}^{\alpha}
-\eqqcolon C_G.
+\equiv C_G.
 $$
 
 Let $\rho=r_1/r_2\geq 1$ and let $p_1$ be the majority probability. An interior
