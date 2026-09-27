@@ -23,3 +23,21 @@ export function ampPoly(z: Complex, n: number): number {
   }
   return Math.hypot(s[0], s[1]);
 }
+
+/** Least-squares line y = slope x + intercept, with R^2 (src/fitting.py::least_squares_line). */
+export function lsq(x: number[], y: number[]): { slope: number; intercept: number; r2: number } {
+  const n = x.length;
+  if (n < 2) return { slope: NaN, intercept: NaN, r2: NaN };
+  const mx = x.reduce((a, b) => a + b, 0) / n;
+  const my = y.reduce((a, b) => a + b, 0) / n;
+  let sxy = 0;
+  let sxx = 0;
+  let syy = 0;
+  for (let i = 0; i < n; i++) {
+    sxy += (x[i] - mx) * (y[i] - my);
+    sxx += (x[i] - mx) ** 2;
+    syy += (y[i] - my) ** 2;
+  }
+  const slope = sxy / sxx;
+  return { slope, intercept: my - slope * mx, r2: syy > 0 ? (sxy * sxy) / (sxx * syy) : 1 };
+}

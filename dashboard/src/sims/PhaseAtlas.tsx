@@ -269,7 +269,7 @@ export function PhaseAtlas() {
       />
       <Notes
         tryThis={[
-          "Two outcomes: the dark-to-bright edge follows the dashed curve α = ln ρ / ln min(G, 1/ε) exactly (Exp 4 checked 19 125 points, zero mismatches).",
+          "Two outcomes: the dark-to-bright edge follows the dashed curve α = ln ρ / ln min(G, 1/ε) exactly (Exp 4 solved 19,125 points with a solver that never uses the formula: 0 mismatches at the 19,120 off the boundary, and the 5 exactly on it are extinct, as the strict inequality requires).",
           "Five outcomes: bands of 1 to 5 survivors. At α = 1, G = 2 keeps 2, G = 4 keeps 3, G = 8 keeps 4, G = 16 keeps all 5.",
         ]}
         math={

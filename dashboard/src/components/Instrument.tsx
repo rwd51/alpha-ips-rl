@@ -1,6 +1,7 @@
 /** Layout shared by every instrument: header, stage, controls, notes. */
 import type { ReactNode } from "react";
 import type { EngineHandle } from "../engine/useEngine";
+import type { Part } from "../presenters";
 
 export function Stage(props: {
   handle: EngineHandle;
@@ -110,12 +111,15 @@ export function Instrument(props: {
   );
 }
 
-export function Group(props: { id: string; num: string; title: string; intro: ReactNode; children: ReactNode }) {
+export function Group(props: { part: Part; intro: ReactNode; children: ReactNode }) {
+  const { part } = props;
   return (
-    <section className="group" id={props.id}>
+    <section className="group" id={part.id}>
       <div className="group-head">
-        <span className="num">{props.num}</span>
-        <h2>{props.title}</h2>
+        <span className="num">
+          {part.label.toUpperCase()} · {part.slides.toUpperCase()} · PRESENTED BY {part.presenter.toUpperCase()}
+        </span>
+        <h2>{part.title}</h2>
         <p>{props.intro}</p>
       </div>
       {props.children}

@@ -1,77 +1,95 @@
+import { useEffect } from "react";
 import { LabProvider } from "./engine/LabContext";
 import { Group } from "./components/Instrument";
-import { Footer, InstrumentIndex, TopBar } from "./components/Chrome";
+import { Footer, PresenterMap, TopBar } from "./components/Chrome";
+import { partById } from "./presenters";
 import { Hero } from "./sims/SimplexFlow";
 import { Tetrahedron } from "./sims/Tetrahedron";
 import { OutcomeRace } from "./sims/OutcomeRace";
 import { BallsIntoBins } from "./sims/BallsIntoBins";
+import { CollapseClock } from "./sims/CollapseClock";
 import { WeightCeiling } from "./sims/WeightCeiling";
 import { SurvivalSurface } from "./sims/SurvivalSurface";
 import { PhaseAtlas } from "./sims/PhaseAtlas";
+import { InterpolationAudit } from "./sims/InterpolationAudit";
 import { StabilityRace } from "./sims/StabilityRace";
 import { AmplificationLandscape } from "./sims/AmplificationLandscape";
+import { RootRace } from "./sims/RootRace";
 import { NewtonHops } from "./sims/NewtonHops";
+import { NestedSolver } from "./sims/NestedSolver";
 import { EstimatorLab } from "./sims/EstimatorLab";
+import { DynamicsDistortion } from "./sims/DynamicsDistortion";
 import { EmaOscillator } from "./sims/EmaOscillator";
+import { CeilingRecap } from "./sims/CeilingRecap";
 import { Foragers } from "./sims/Foragers";
 
+// sections follow the defence deck (presentation/main.tex); src/presenters.ts says who presents each
 export default function App() {
+  // the page renders after the browser has tried the #anchor, so a direct link like
+  // .../#nested (one presenter's demo) needs to be scrolled to once the sections exist
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (id) document.getElementById(id)?.scrollIntoView();
+  }, []);
+
   return (
     <LabProvider>
       <TopBar />
       <main className="wrap" id="top">
         <Hero />
-        <InstrumentIndex />
+        <PresenterMap />
 
         <Group
-          id="g-dial"
-          num="I · THE DIAL"
-          title="Where training settles, and how it gets there"
-          intro="The ideal flow of equation (*), with exact probabilities and no sampling noise. α = 0 is standard expected-return training (Experiment 1); α = 1 is the paper's inverse probability scaling."
+          part={partById("part1")}
+          intro="Expected-return training (α = 0) with exact probabilities and with sampled groups. An exact tie does not move at all without noise; with noise it collapses onto an arbitrary winner, on a clock set by the reward gap and the group size."
+        >
+          <OutcomeRace />
+          <BallsIntoBins />
+          <CollapseClock />
+        </Group>
+
+        <Group
+          part={partById("part2")}
+          intro="Scaling rewards by 1/p^α turns collapse into a dial: p* ∝ r^(1/α). The same exponent sets how fast training settles, which step sizes are stable, and, with a finite group, a ceiling on how much any outcome can be boosted."
         >
           <Tetrahedron />
-          <OutcomeRace />
-        </Group>
-
-        <Group
-          id="g-groups"
-          num="II · SAMPLING AND GROUP SIZE"
-          title="What a finite group of G samples can and cannot see"
-          intro="Real training never knows p. It estimates p̂ from G samples, and that single fact caps how much any outcome can be boosted."
-        >
-          <BallsIntoBins />
-          <WeightCeiling />
-          <SurvivalSurface />
-          <PhaseAtlas />
-        </Group>
-
-        <Group
-          id="g-numerics"
-          num="III · NUMERICS"
-          title="The solvers behind the curves"
-          intro="Euler, RK4 and Newton–Raphson, run on the project's own equation, so you can see where each one works and where it breaks."
-        >
           <StabilityRace />
           <AmplificationLandscape />
-          <NewtonHops />
+          <WeightCeiling />
         </Group>
 
         <Group
-          id="g-estimators"
-          num="IV · ESTIMATORS"
-          title="How far p̂ is from p, and whether it matters"
-          intro="Experiment 5 measured the bias and variance of the weight estimate exactly, then asked which of those errors the learning dynamics actually notice."
+          part={partById("part3")}
+          intro="Solve ż = 0 directly instead of integrating to it: bisection, secant and Newton on three equivalent forms of the same condition, then a nested solver for the finite-group fixed point with many outcomes."
+        >
+          <RootRace />
+          <NewtonHops />
+          <NestedSolver />
+        </Group>
+
+        <Group
+          part={partById("part4")}
+          intro="The survival boundary checked jointly over α, G, ε and the reward ratio, and extended to five outcomes. Then the question a practitioner asks: can a precomputed grid stand in for the solver?"
+        >
+          <SurvivalSurface />
+          <PhaseAtlas />
+          <InterpolationAudit />
+        </Group>
+
+        <Group
+          part={partById("part5")}
+          intro="Real training never knows p. It estimates p^−α from G samples. How wrong is that estimate, which of its errors do the learning dynamics notice, and what does averaging over steps buy?"
         >
           <EstimatorLab />
+          <DynamicsDistortion />
           <EmaOscillator />
         </Group>
 
         <Group
-          id="g-analogies"
-          num="V · ANALOGIES"
-          title="The same law in other worlds"
-          intro="p* ∝ r^(1/α) is not unique to reinforcement learning. Here it appears in animals choosing where to feed."
+          part={partById("closing")}
+          intro="What the paper proved, what we derived on top, and the one result every part runs into from a different side. Then the same law in a different world."
         >
+          <CeilingRecap />
           <Foragers />
         </Group>
 

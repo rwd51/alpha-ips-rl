@@ -1,13 +1,8 @@
-/** Page chrome: sticky top bar, instrument index and footer. */
+/** Page chrome: sticky top bar, presenter map and footer. */
 import { useLab } from "../engine/LabContext";
+import { PARTS } from "../presenters";
 
-const NAV = [
-  ["#g-dial", "Dial"],
-  ["#g-groups", "Groups"],
-  ["#g-numerics", "Numerics"],
-  ["#g-estimators", "Estimators"],
-  ["#g-analogies", "Analogies"],
-];
+const NAV = PARTS.map((p) => [`#${p.id}`, p.label === "Overall" ? "Overall" : p.label.replace("Part ", "P")]);
 
 export function TopBar() {
   const { paused, setPaused, linkAlpha, setLinkAlpha } = useLab();
@@ -37,29 +32,29 @@ export function TopBar() {
   );
 }
 
-const INDEX: [string, string, string][] = [
-  ["tetra", "Four outcomes, one tetrahedron", "3-D · Exp 2 · tie race"],
-  ["race", "The outcome race", "Exp 1–2 · tied tiers"],
-  ["balls", "Balls into bins", "Exp 1 Fig 2 · Exp 2 Fig 4a"],
-  ["ceiling", "The weight ceiling", "Exp 2–3 · Exp 5 Fig 3"],
-  ["surface", "Survival surface", "3-D · Exp 2 Fig 4 · Exp 4"],
-  ["atlas", "Phase atlas", "Exp 4 Figs 1–2"],
-  ["stab", "Euler vs RK4", "Exp 1 Fig 3 · Exp 2 Fig 3"],
-  ["amp", "Amplification landscape", "3-D · numerics"],
-  ["newton", "Newton's tangent hops", "Exp 3 Fig 1"],
-  ["est", "Estimator lab", "Exp 5 Figs 1–2"],
-  ["ema", "The EMA oscillator", "Exp 5 Fig 5"],
-  ["ifd", "Foragers and patches", "analogy · ecology"],
-];
-
-export function InstrumentIndex() {
+/** Who presents which part, and the demos each speaker can open, in slide order. */
+export function PresenterMap() {
   return (
-    <nav className="index" aria-label="All instruments">
-      {INDEX.map(([id, name, prov]) => (
-        <a key={id} href={`#${id}`}>
-          <b>{name}</b>
-          <small>{prov}</small>
-        </a>
+    <nav className="pmap" aria-label="Presenters and their demos">
+      {PARTS.map((p) => (
+        <div className="pcard" key={p.id}>
+          <a className="phead" href={`#${p.id}`}>
+            <small>
+              {p.label} · {p.slides}
+            </small>
+            <b>{p.title}</b>
+            <span>
+              {p.presenter} <em>{p.roll}</em>
+            </span>
+          </a>
+          <ol>
+            {p.demos.map(([id, name]) => (
+              <li key={id}>
+                <a href={`#${id}`}>{name}</a>
+              </li>
+            ))}
+          </ol>
+        </div>
       ))}
     </nav>
   );

@@ -543,20 +543,27 @@ size can overshoot. Part 2 is where instability appears.
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.48\textwidth}
 \footnotesize
-Test every prediction of the $\alpha$ generalisation, first on the exact ODE and
-then on the sampled agent.
-
-\medskip
-\begin{itemize}\setlength\itemsep{3pt}
-  \item Does the flow really settle at $p^\star\propto r^{1/\alpha}$?
-  \item \emph{How fast} does it get there, and can we predict the rate before
-        running anything?
-  \item Which step sizes are safe for an explicit method?
-  \item Does a finite group change the answer?
+\textbf{The idea.} The paper divides each reward by $p$. We divide by
+$p^{\alpha}$ instead, so $\alpha$ becomes a \alert{dial}:
+\begin{itemize}\setlength\itemsep{1pt}
+  \item $\alpha=0$: no fix, one answer takes everything.
+  \item $\alpha=1$: the paper's fix, share matches reward.
+  \item large $\alpha$: shares become almost equal.
 \end{itemize}
 
 \medskip
-The last question produced the result that the rest of the project is built on.
+\textbf{Where training ends up.} Training stops when every answer earns the
+same corrected reward $r_i/p_i^{\alpha}$. That gives
+\alert{$p_i^\star \propto r_i^{1/\alpha}$}.
+
+\medskip
+\textbf{Our four questions.}
+\begin{enumerate}\setlength\itemsep{0pt}
+  \item Does training really end up there?
+  \item How fast does it get there?
+  \item How big a step can the solver take?
+  \item What changes with a small sample group?
+\end{enumerate}
 \end{column}
 
 \begin{column}{0.49\textwidth}
@@ -565,7 +572,7 @@ The last question produced the result that the rest of the project is built on.
 \begin{tikzpicture}[scale=0.92, transform shape]
 \begin{axis}[
   width=6.0cm, height=4.2cm, scale only axis,
-  xlabel={exponent $\alpha$}, ylabel={$p_1^\star$},
+  xlabel={dial $\alpha$}, ylabel={share of the better answer},
   xmode=log, xmin=0.28, xmax=5.5, ymin=0.5, ymax=1.03,
   xtick={0.3,0.5,1,2,5}, xticklabels={0.3,0.5,1,2,5},
   ytick={0.5,0.6,0.7,0.8,0.9,1.0},
@@ -575,10 +582,10 @@ The last question produced the result that the rest of the project is built on.
 ]
   \addplot[mOrange, very thick, domain=0.28:5.5, samples=120]
     {(4^(1/x))/((4^(1/x))+1)};
-  \addlegendentry{$r=(4,1)$}
+  \addlegendentry{rewards 4 and 1}
   \addplot[mBlue, thick, dashed, domain=0.28:5.5, samples=120]
     {(2^(1/x))/((2^(1/x))+1)};
-  \addlegendentry{$r=(2,1)$}
+  \addlegendentry{rewards 2 and 1}
   \addplot[only marks, mark=*, mark size=1.4pt, mTeal]
     coordinates {(0.5,0.941176) (1,0.8) (2,0.666667)};
 \end{axis}
@@ -586,8 +593,8 @@ The last question produced the result that the rest of the project is built on.
 
 \vspace{1mm}
 {\scriptsize\raggedright
-Marked points: $94/6$, $80/20$, $67/33$. RK4 endpoints land on the analytic
-curve to $7.5\times10^{-15}$.\par}
+Dots: our predicted splits $94/6$, $80/20$, $67/33$. The simulation lands on
+the curve to machine precision ($7.5\times10^{-15}$).\par}
 \end{column}
 \end{columns}
 \end{frame}
@@ -599,46 +606,41 @@ curve to $7.5\times10^{-15}$.\par}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.49\textwidth}
 
-\textbf{Modelling with differential equations.}
-Stationary points come from setting $\dot z_i=0$, so $r_i p_i^{-\alpha}$ must be the
-same constant for every $i$:
-\[
-  p_i^\star \propto r_i^{1/\alpha}.
-\]
+\textbf{Differential equations.}
+Training is an ODE, $\dot z=f(z)$. Setting $\dot z=0$ gives the end point
+$p^\star\propto r^{1/\alpha}$.
 
 \medskip
-\textbf{Eigenvalue decomposition.}
-Linearise at $p^\star$. With the softmax derivative
-$C=\mathrm{diag}(p^\star)-p^\star p^{\star\top}$, perturbing the flow gives
+\textbf{Eigenvalues: how fast training settles.}
+Near the end point the error shrinks like $e^{-\lambda t}$. The rates
+$\lambda$ are the eigenvalues of one matrix, the Jacobian:
 \[
-  J^\star=-\alpha\lVert r\rVert_{1/\alpha}\,C .
+  J^\star=-\alpha\lVert r\rVert_{1/\alpha}\,
+  \bigl(\mathrm{diag}\,p^\star-p^\star p^{\star\top}\bigr).
 \]
-$J^\star$ is symmetric negative semidefinite. Its nonzero eigenvalues are the
-convergence rates
-\[
-  \lambda_j=\alpha\lVert r\rVert_{1/\alpha}\,\mu_j ,
-\]
-with $\mu_j$ the nonzero eigenvalues of $C$. One zero eigenvalue survives, along
-$\mathbf 1$, because shifting all logits leaves $p$ unchanged.
+Big $\lambda$ means fast, small $\lambda$ means slow.
+
+\smallskip
+One eigenvalue is always $0$: adding the same number to every logit
+changes nothing, so nothing pulls back in that direction.
 
 \end{column}
 \begin{column}{0.47\textwidth}
 
-\textbf{Least-squares regression.}
-Fit $\ln\lVert p(t)-p^\star\rVert_1$ against $t$ inside a window past the
-nonlinear transient and above round-off. The slope is the measured rate, checked
-against $\lambda_{\min}$ above.
+\textbf{Least squares: measuring the rate.}
+On a log scale the error is a straight line. Its slope is the rate. We fit the
+slope and compare it with the eigenvalue.
 
 \medskip
-\textbf{Round-off error.}
-The fit window is chosen as $[10^{-12},10^{-6}]$ precisely because below
-$10^{-12}$ the error is round-off, not dynamics.
+\textbf{Round-off error: where to fit.}
+Only between $10^{-6}$ and $10^{-12}$. Above that the line is not straight
+yet; below it the computer's precision floor takes over.
 
 \medskip
 \begin{tikzpicture}[scale=0.9, transform shape]
 \begin{axis}[
   width=4.6cm, height=2.6cm, scale only axis,
-  xlabel={$t$}, ylabel={$\lVert p-p^\star\rVert_1$},
+  xlabel={time $t$}, ylabel={error},
   ymode=log, xmin=0, xmax=12, ymin=1e-16, ymax=3,
   ytick={1e-15,1e-10,1e-5,1}, xtick={0,6,12},
   label style={font=\tiny}, tick label style={font=\tiny},
@@ -648,7 +650,7 @@ $10^{-12}$ the error is round-off, not dynamics.
     {max(exp(-3.2*x), 1e-13)};
   \addplot[mGrey, dashed, domain=0:12, samples=2]{1e-13};
   \node[font=\tiny, text=mGrey, anchor=south east]
-    at (axis cs:11.7,4e-12) {round-off floor};
+    at (axis cs:11.7,4e-12) {precision floor};
 \end{axis}
 \end{tikzpicture}
 
@@ -663,41 +665,42 @@ $10^{-12}$ the error is round-off, not dynamics.
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.5\textwidth}
 
-\textbf{Stability of explicit ODE methods.}
-A linear mode with rate $\lambda$ is stable only if
+\textbf{Stability: how big a step?}
+Each solver step multiplies the error by some factor. If that factor is bigger
+than 1, the error grows every step and the run blows up. Safe steps:
 \[
   h\lambda_{\max} < 2 \;\;(\text{Euler}),
   \qquad
-  h\lambda_{\max} < 2.7853\;\;(\text{RK4}).
+  h\lambda_{\max} < 2.785\;\;(\text{RK4}).
 \]
-The RK4 constant is the real root of
-$x^3-4x^2+12x-24=0$, which we obtain by \alert{bisection} rather than quoting it.
 
-\medskip
 \textbf{Root finding: bisection.}
-The critical step size is found by bisection \emph{on the actual nonlinear
-iteration}: shrink or grow $h$ until a $10^{-4}$ perturbation of $z^\star$ stops
-decaying. It matches the linear theory to $2.6\times10^{-4}$ (Euler) and
-$1.3\times10^{-4}$ (RK4).
+The RK4 limit $2.785$ is the root of $x^3-4x^2+12x-24=0$. We computed it by
+\alert{bisection} instead of looking it up.
+
+\smallskip
+Then we used bisection on the real simulation to find the largest step that
+still settles. It matches the theory to within $0.03\%$.
 
 \end{column}
 \begin{column}{0.46\textwidth}
 
-\textbf{Random number generation and simulation.}
-The sampled agent is one noisy Euler step per iteration. Group frequencies obey
+\textbf{Random sampling: real training.}
+Real training does not know $p$. It draws a group of $G$ samples and counts
+them:
 \[
   G\hat p_i \sim \mathrm{Binomial}(G,p_i).
 \]
-Taking the expectation of that update replaces $p_i^{-\alpha}$ by an
-\alert{effective weight}
+Averaging over many groups gives an \alert{effective weight} $w_G(p)$ that
+takes the place of $p^{-\alpha}$. The end point then solves
 \[
-  w_G(p)=\frac{\mathbb{E}\!\left[\hat p\,\omega(n)\right]}{p},
+  r_i\,w_G(p_i)=S ,
 \]
-whose stationary condition $r_i w_G(p_i)=S$ is solved by bisection.
+again by bisection.
 
 \medskip
-\textbf{Model validation.} Every Monte-Carlo run is compared against that
-mean-field prediction, which is the $h\to0$ limit of the same update.
+\textbf{Checking the model.} Every random simulation is compared against this
+average prediction.
 
 \end{column}
 \end{columns}
@@ -709,18 +712,17 @@ mean-field prediction, which is the $h\to0$ limit of the same update.
 \footnotesize
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.49\textwidth}
-\textbf{The knob works, and the rate is predictable.}
-Fitted rate against $\lambda_{\min}$ from the Jacobian: relative error
-$\le \hit{$1.7\times10^{-5}$}$ over 27 runs ($K=2$).
+\textbf{1. The dial works, and we can predict the speed.}
+Measured speed against the eigenvalue: within \hit{$0.002\%$} over 27 runs.
 
 \medskip
-\textbf{Both ends of the dial are numerically hard.}
+\textbf{2. Both ends of the dial are hard to simulate.}
 
 \centering
 {\scriptsize
 \begin{tabular}{@{}lccc@{}}
 \toprule
-$\alpha$ & $\lambda_{\min}$ & $\lambda_{\max}$ & ratio \\
+$\alpha$ & slowest rate & fastest rate & fast / slow \\
 \midrule
 0.1 & $5.8\times10^{-8}$ & 0.089 & $1.5\times10^{6}$ \\
 1   & 1.15 & 4.53 & 3.9 \\
@@ -729,43 +731,42 @@ $\alpha$ & $\lambda_{\min}$ & $\lambda_{\max}$ & ratio \\
 \end{tabular}}
 
 \raggedright\smallskip
-\medskip
-Small $\alpha$ is stiff (huge spread of time scales). Large $\alpha$ makes every
-rate large, so stability, not accuracy, sets $h$. Part 1's step $h=0.05$ becomes
-unstable above $\alpha=2.06$ for Euler.
+Small $\alpha$: the rates differ by a million times (a \alert{stiff}
+problem). Large $\alpha$: every rate is huge, so the step must be tiny. Part 1's
+step $h=0.05$ blows up above $\alpha=2.06$.
 
 \medskip
-$\alpha=0$ is a \alert{singular limit}: the approach is algebraic,
-$p_2\sim 1/(2\Delta t)$, fitted tail slope $-1.007$, with no exponential rate at all.
+\textbf{3. At $\alpha=0$ there is no rate at all.} The losing answer fades like
+$1/t$ (measured slope $-1.007$), not exponentially.
 \end{column}
 
 \begin{column}{0.48\textwidth}
-\textbf{The result the project is built on.}
-A group of $G$ sees a rare outcome at most once, at frequency $1/G$. So the
-inverse-probability weight is \alert{capped}:
+\textbf{4. The key result: a small group caps the boost.}
+A group of $G$ samples sees a rare answer at most once, so it never estimates
+$p$ below $1/G$. The boost $1/p^{\alpha}$ is capped:
 \[
-  w_G(p)\;\longrightarrow\;\min\{G,1/\varepsilon\}^{\alpha}
-  \quad\text{as } p\to 0 .
+  \text{boost} \le \min\{G,1/\varepsilon\}^{\alpha}.
 \]
-The minority outcome survives only if
+The weaker answer survives only if the cap beats the reward ratio:
 \[
-  \boxed{\;\alpha > \alpha_c=\frac{\ln(r_1/r_2)}{\ln\min\{G,1/\varepsilon\}}\;}
+  \boxed{\;\alpha > \frac{\ln(r_1/r_2)}{\ln\min\{G,1/\varepsilon\}}\;}
 \]
 
 \centering
-{\scriptsize
+{\scriptsize\setlength\tabcolsep{4pt}
 \begin{tabular}{@{}lccccc@{}}
 \toprule
 $G$ & 4 & 8 & 16 & 32 & 64 \\
 \midrule
-$\alpha_c$, $r=(4,1)$ & 1.0 & 0.667 & 0.5 & 0.4 & 0.333 \\
+$\alpha$ needed (rewards 4, 1) & 1.0 & 0.667 & 0.5 & 0.4 & 0.333 \\
 \bottomrule
 \end{tabular}}
 
 \raggedright\smallskip
 \medskip
-\bad{At $G=4$ the paper's own $\alpha=1$ fails}: long-run $p_1=0.9965$ instead of
-$0.8$. Monte Carlo tracks the mean field to $0.013$ worst case.
+\bad{With $G=4$ the paper's $\alpha=1$ is not enough}: the weaker answer dies
+(better answer's share $0.9965$, not $0.8$). Simulations match the
+prediction to $0.013$.
 \end{column}
 \end{columns}
 \end{frame}
@@ -1373,40 +1374,40 @@ $G$ & clip (paper) & guarded Richardson \\
 \centering
 \vspace{-1mm}
 {\scriptsize
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.0cm}
-                  >{\raggedright\arraybackslash}p{3.5cm}
-                  >{\raggedright\arraybackslash}p{5.3cm}@{}}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.6cm}
+                  >{\raggedright\arraybackslash}p{2.9cm}
+                  >{\raggedright\arraybackslash}p{6.3cm}@{}}
 \toprule
-\textbf{Claim} & \textbf{Paper} & \textbf{Our work} \\
+\textbf{Question} & \textbf{The paper} & \textbf{What we added} \\
 \midrule
-Expected return collapses &
-  Proved for the idealised flow &
-  Reproduced, and \alert{sharpened}: under an exact tie the deterministic flow
-  does not move at all ($10^{-16}$); the collapse is driven by sampling noise \\
+Does expected return collapse onto one answer? &
+  Proved it &
+  Made it precise: with an exact tie \alert{nothing moves at all} ($10^{-16}$).
+  The random sampling is what picks a winner. \\
 \addlinespace[3pt]
-IPS gives $p^\star\propto r$ &
-  Proved and demonstrated &
-  Reproduced to $7.5\times10^{-15}$, and generalised to
-  $p^\star\propto r^{1/\alpha}$ \\
+Does IPS give share $\propto$ reward? &
+  Proved it &
+  Confirmed to machine precision, and extended to any dial setting:
+  share $\propto r^{1/\alpha}$. \\
 \addlinespace[3pt]
-Group size $G$ and clip $\varepsilon$ matter &
-  Ablated empirically, their Table~4 &
-  \alert{Derived}: survival needs
-  $\alpha>\ln\rho/\ln\min\{G,1/\varepsilon\}$, verified at $0/19{,}125$
-  misclassifications \\
+Do the group size $G$ and clip $\varepsilon$ matter? &
+  Tried a few values (their Table~4) &
+  \alert{Derived the exact rule}: the weaker answer survives only if
+  $\alpha>\ln\rho/\ln\min\{G,1/\varepsilon\}$. Checked on 19{,}125 settings
+  with no exceptions. \\
 \addlinespace[3pt]
-Clipping brings a bias against variance trade-off &
-  Stated as a limitation &
-  \alert{Quantified}: exact bias and variance, the optimal clip
-  $\varepsilon^\star=p$, and three alternative rules compared \\
+Does clipping cause a bias--variance trade-off? &
+  Named it as a limitation &
+  \alert{Measured it exactly}. The best clip is $\varepsilon=p$, and we
+  compared three other rules. \\
 \bottomrule
 \end{tabular}}
 
 \vspace{4mm}
 {\footnotesize\raggedright
-We did not reproduce the paper's LLM or molecular experiments, which need
-infrastructure outside this course. What we reproduced is the \emph{mechanism},
-in a model where nothing else can explain the result.\par}
+We did not rerun the paper's language-model or molecule experiments; they need
+far more computing than this course. We reproduced the \emph{mechanism}, in a
+small model where nothing else can explain the result.\par}
 \end{frame}
 
 % --------------------------------------------------------------- O2
@@ -1419,7 +1420,7 @@ in a model where nothing else can explain the result.\par}
 \begin{tikzpicture}[scale=0.94, transform shape]
 \begin{axis}[
   width=5.8cm, height=4.2cm, scale only axis,
-  xlabel={outcome probability $p$}, ylabel={weight applied},
+  xlabel={how likely the answer is, $p$}, ylabel={boost it receives},
   xmode=log, ymode=log,
   xmin=1e-3, xmax=1, ymin=0.8, ymax=1200,
   xtick={1e-3,1e-2,1e-1,1}, ytick={1,10,100,1000},
@@ -1428,41 +1429,41 @@ in a model where nothing else can explain the result.\par}
   legend style={font=\tiny, draw=none, fill=none, at={(0.02,0.03)}, anchor=south west},
 ]
   \addplot[mGrey, thick, dashed, domain=1e-3:1, samples=120]{1/x};
-  \addlegendentry{ideal $p^{-1}$}
+  \addlegendentry{ideal $1/p$}
   \addplot[mOrange, very thick, domain=1e-3:1, samples=160]{(1-(1-x)^16)/x};
-  \addlegendentry{$G=16$}
+  \addlegendentry{group of 16}
   \addplot[mBlue, thick, domain=1e-3:1, samples=160]{(1-(1-x)^64)/x};
-  \addlegendentry{$G=64$}
+  \addlegendentry{group of 64}
 \end{axis}
 \end{tikzpicture}
 \end{column}
 
 \begin{column}{0.47\textwidth}
 \footnotesize
-\textbf{A finite group cannot apply an unbounded correction.}
+\textbf{One result that every part runs into.}
 
 \medskip
-The ideal weight $p^{-\alpha}$ grows without limit as an outcome gets rarer. What
-a group of $G$ can apply saturates, because a rare outcome is seen at most once,
-at frequency $1/G$:
+The ideal boost $1/p$ keeps growing as an answer gets rarer (dashed). A real
+group of $G$ samples can only give a limited boost (solid lines), because a
+rare answer shows up in the group at most once:
 \[
-  w_G(p)\;\longrightarrow\;\min\{G,1/\varepsilon\}^{\alpha}.
+  \text{boost} \le \min\{G,1/\varepsilon\}^{\alpha}.
 \]
 
 \smallskip
-Every part meets this ceiling from a different direction:
+Each part meets this cap from a different side:
 
 \smallskip
 {\scriptsize
 \begin{tabular}{@{}ll@{}}
-Part 2 & finds it, and gets $\alpha_c$ for $K=2$ \\
-Part 3 & shows $K>2$ needs a strictly larger $\alpha$ \\
-Part 4 & verifies it over 19{,}125 points \\
-Part 5 & shows only $\omega(1)/\omega(G)$ decides it \\
+Part 2 & finds the cap and the two-answer rule \\
+Part 3 & with more answers, a bigger $\alpha$ is needed \\
+Part 4 & checks the rule on 19{,}125 settings \\
+Part 5 & only the size of the cap decides survival \\
 \end{tabular}}
 
 \smallskip
-At $\alpha=1$ the curve above is exactly $(1-(1-p)^G)/p$, proved in Part 5.
+At $\alpha=1$ the solid curves are exactly $(1-(1-p)^G)/p$ (Part 5).
 \end{column}
 \end{columns}
 \end{frame}
@@ -1473,37 +1474,35 @@ At $\alpha=1$ the curve above is exactly $(1-(1-p)^G)/p$, proved in Part 5.
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.48\textwidth}
 \footnotesize
-\textbf{What a practitioner should take away}
+\textbf{Advice for anyone using this}
 
 \begin{itemize}\setlength\itemsep{3pt}
-  \item Pick $G$ first. If $\min\{G,1/\varepsilon\}<r_{\max}/r_{\min}$, no
-        exponent and no amount of training will keep the weak outcomes.
-  \item Do not set $\varepsilon$ above $1/G$ without checking: it introduces a
-        second, independent ceiling.
-  \item For $K$ outcomes, the pairwise threshold is optimistic. At $G=16$ the
-        weakest of five outcomes needs $\alpha=0.886$, not $0.580$.
-  \item A moving average buys the variance of a $19\times$ larger group at
-        $\beta=0.1$ with no extra rollouts, but it makes training ring if
-        $\beta<4h\lambda$.
+  \item \textbf{Choose the group size first.} If $\min\{G,1/\varepsilon\}$ is
+        smaller than best reward $\div$ worst reward, no $\alpha$ can keep the
+        weak answers.
+  \item \textbf{Keep $\varepsilon$ at or below $1/G$.} A bigger clip adds a
+        second cap.
+  \item \textbf{With many answers, the two-answer rule is too hopeful.} At
+        $G=16$ the weakest of five needs $\alpha=0.886$, not $0.580$.
+  \item \textbf{Averaging over steps is cheap noise reduction}, like a
+        $19\times$ bigger group at $\beta=0.1$. With too little damping
+        ($\beta<4h\lambda$) training oscillates.
 \end{itemize}
 \end{column}
 
 \begin{column}{0.48\textwidth}
 \footnotesize
-\textbf{What we are not claiming}
+\textbf{What we do not claim}
 
 \begin{itemize}\setlength\itemsep{3pt}
-  \item Everything is the outcome-selection bandit. Our update is
-        group-REINFORCE without GRPO's advantage standardisation or PPO clipping,
-        so the conclusions are about the \emph{weight rule}, not the whole
-        algorithm.
-  \item The $\alpha$-matched offset we derived is second order, not exact, and it
-        costs dynamic range when $\alpha>1$.
-  \item A per-outcome moving average assumes a small, enumerable outcome set.
-        That is true here and false for the paper's LLM setting.
-  \item The global convergence proof for general $\alpha$ is not attempted. We
-        state the fixed point analytically and demonstrate convergence
-        numerically from many initial conditions.
+  \item We studied a simple model: one choice among $K$ answers. It is not full
+        GRPO with its reward normalisation and PPO clipping, so our results are
+        about the \emph{weight rule}.
+  \item Our $\alpha$-matched correction is accurate to second order, not exact.
+  \item Averaging per answer needs a short list of possible answers. That is
+        true here, not for generated text.
+  \item We show convergence in simulations from many starting points; we do
+        not prove it for every $\alpha$.
 \end{itemize}
 \end{column}
 \end{columns}

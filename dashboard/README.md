@@ -1,7 +1,9 @@
 # α-IPS Observatory
 
-Interactive, live simulations of the `alpha-ips-rl` project (CSE 402): thirteen
-instruments, three of them in real-time 3-D, covering Experiments 1–5.
+Interactive, live simulations of the `alpha-ips-rl` project (CSE 402): eighteen
+instruments, three of them in real-time 3-D, covering Experiments 1–5. The page
+follows the defence deck (`../presentation/main.tex`): one section per part,
+labelled with its presenter, then the overall findings.
 
 Built with React + TypeScript + Vite. three.js draws the 3-D scenes; the fonts
 are bundled, so it runs fully offline once installed.
@@ -42,6 +44,7 @@ src/
     useEngine.ts    React hook: canvases, animation loop, on-screen detection, resize, play/pause
     LabContext.tsx  "Pause all" and "Link α across instruments"
   components/   shared UI: sliders, segmented buttons, readouts, instrument layout
+  presenters.ts who presents which part, and which demos belong to it
   sims/         one file per instrument (engine + React panel)
   data/         atlasK5.json, precomputed with src/finite_group_general.py
 ```
@@ -54,7 +57,11 @@ Each file in `sims/` has two parts:
   `useEngine`, and lays out the panel.
 
 To add an instrument: copy a similar file in `sims/`, change the engine and the
-controls, and add the component to `App.tsx`.
+controls, add the component to its part in `App.tsx`, and list it under that
+part in `src/presenters.ts` so it shows up in the presenter map.
+
+A walkthrough of every demo, grouped by presenter, is in
+`../presentation/DEMO_GUIDE.md`.
 
 ## Where the numbers come from
 
