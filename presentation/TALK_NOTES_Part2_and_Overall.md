@@ -1,4 +1,4 @@
-# Talk notes: Part 2 (slides 13–17) and Overall findings (slides 31–34)
+# Talk notes: Part 2 (slides 13–19) and Overall findings (slides 33–36)
 
 Speaker: Mohammad Raihan Rashid. Plain-language points to say for each slide. The
 numbers match the slides and `RESULTS_exp2.md`.
@@ -20,83 +20,109 @@ numbers match the slides and `RESULTS_exp2.md`.
 > "Ruwad showed that normal training collapses. I'll show what happens when we
 > turn the paper's fix into a dial."
 
-## Slide 14: Objective
+## Slide 14: Objective (figure: training runs settling)
 
-- "The paper divides every reward by p, the probability of the answer. We divide
-  by p to the power α. So α is a dial."
-- "At α = 0 there is no fix, and one answer takes everything. At α = 1 we get the
-  paper's fix, where each answer's share matches its reward. At large α all
-  answers get almost the same share."
-- "Training stops when every answer earns the same corrected reward. That gives
-  one simple formula: share ∝ r to the power 1/α."
-- Point at the plot: "Two answers, rewards 4 and 1. We predicted 94/6, 80/20 and
-  67/33. The simulation hits these exactly, to machine precision."
-- "So we asked four questions: does training really end up there, how fast, how
-  big a step is safe, and what changes with a small group of samples?"
+**Say what training is first.**
+- "The model gives each answer a probability. At every step, answers that earn
+  more reward are pushed up a little. After many steps nothing changes any more:
+  that's where training ends."
+- "The paper divides each reward by p, the answer's probability. We divide by p
+  to the power α, so α is a dial. Training then ends at share ∝ r^(1/α)."
 
-*Optional demo (20 s): `#tetra`. Drag α and watch the dot move from a corner to
-the centre.*
+**Then explain the figure.**
+- "Two answers. Rewards 4 and 1. The rewards are fixed; the probabilities are
+  what training finds."
+- "Every run starts at 50/50. Each curve is one run: the better answer's share
+  over time."
+- "Each α ends at a different level. At α = 0 the better answer takes 100%. At
+  α = 0.5 it ends at 94%, which leaves 6% for the other: that's what '94/6'
+  means. At α = 1 it's 80/20, the same as the rewards 4 : 1. At α = 2 it's
+  67/33."
+- "So we asked four questions: does training really end there, how fast, how big
+  a step is safe, and what changes with a small group of samples?"
 
-## Slide 15: Numerical Methods (1/2)
+*Where the numbers come from: 4^(1/α) / (4^(1/α) + 1). α = 0.5 gives 16/17 =
+0.94; α = 1 gives 4/5 = 0.8; α = 2 gives 2/3 = 0.67.*
+
+## Slide 15: Numerical Methods (1/2) (figure: straight error lines)
 
 - "Training is a differential equation. Setting the change to zero gives the end
   point."
-- "**Eigenvalues tell us the speed.** Close to the end point, the error shrinks
-  like e to the minus λ t. The λ values are the eigenvalues of one matrix. A big
-  λ means fast, a small λ means slow."
-- "One eigenvalue is always zero. Adding the same number to every score changes
-  nothing, so nothing pulls back in that direction. That's harmless."
-- "**Least squares measures the speed.** On a log scale the error is a straight
-  line, and its slope is the speed. We fit the slope and compare it with the
-  eigenvalue."
-- "**Round-off decides where we fit.** Only between 10⁻⁶ and 10⁻¹². Above that the
-  line isn't straight yet. Below it we hit the computer's precision floor, the
-  flat part of the small plot."
+- "Near the end point the error shrinks like e to the minus λ t. The λ values,
+  the speeds, are the eigenvalues of one matrix."
+- "One eigenvalue is always zero: adding the same number to every score changes
+  nothing."
+- Point at the figure: "This is the distance between where training is now and
+  where it will end, on a log scale. On a log scale an exponential decay is a
+  straight line, and its slope is the speed."
+- "The four runs have very different speeds: from 0.36 to 45.6, more than 100
+  times apart. But the time axis is multiplied by each run's *predicted* speed.
+  If our prediction is right, all four lines must have the same slope, and they
+  do. That's the check."
+- "We fit the slope by least squares only inside the grey band. Below it the
+  lines go flat: that's the computer's precision floor, about 10⁻¹⁵."
+- If asked "is this the collapse?": "No. For α above 0 training does not
+  collapse; it settles at a mix of answers. This plot shows how fast it settles.
+  At α = 0 there's no exponential at all: the loser fades slowly, like 1/t."
 
-## Slide 16: Numerical Methods (2/2)
+## Slide 16: Numerical Methods (2/2) (figure: Euler jumping)
 
-- "**Stability.** Every solver step multiplies the error by some factor. If that
-  factor is above 1, the error grows each step and the run blows up."
-- "For Euler, h times λ must stay below 2. For RK4, below 2.785."
-- "**Bisection.** 2.785 is the root of a cubic, and we computed it by bisection
-  instead of looking it up. Then we used bisection on the real simulation to find
-  the biggest step that still works. It matched the theory within 0.03%."
-- "**Random sampling.** Real training doesn't know p. It draws a group of G
-  samples and counts them. Averaged over many groups, this gives an effective
-  weight in place of 1/p^α, and we solve for the end point with bisection again."
-- "Every random simulation is checked against this average prediction."
+- "A solver moves in steps. Each step multiplies the error by some factor. If
+  the factor is above 1, the error grows every step and the run blows up."
+- "For Euler, h times λ must stay below 2. For RK4, below 2.785. We found 2.785
+  by bisection, and bisection on the real simulation matched the theory within
+  0.03%."
+- Point at the figure: "Here λ = 8. With step 0.3, h·λ = 2.4, above Euler's
+  limit: the orange Euler run jumps between 0 and 1. RK4 with the same step
+  settles, and so does Euler with the smaller step 0.2."
+- "Real training only sees G samples per step. Averaging over many groups gives
+  an effective weight, and we solve for the end point with bisection. Every
+  simulation is checked against that."
 
-*Demos (40 s):*
-1. *`#stab`: set α = 2. At h = 0.2 both methods settle. Move h to 0.3: Euler
-   starts jumping, RK4 still settles.*
-2. *`#amp`: step the order 1 → 4 and watch the safe (blue) area grow.*
+*Demo (30 s): `#stab`, α = 2. Move h from 0.2 to 0.3 and Euler starts jumping.*
 
-## Slide 17: Results and Analysis
+## Slide 17: Results (1/3): The dial works
 
-**Left side.**
-1. "The dial works, and we can predict the speed. The measured speed matched the
-   eigenvalue within 0.002% over 27 runs."
-2. "Both ends of the dial are hard. At small α the slowest and fastest rates
-   differ by a million times, which is called a stiff problem. At large α every
-   rate is huge, so the step has to be tiny. Part 1's step size breaks above
-   α = 2.06."
-3. "At α = 0 there is no speed at all: the losing answer fades slowly, like 1/t."
+- Left figure: "Final share of the better answer for every α, for three reward
+  pairs. Circles are simulations, lines are the formula. They agree to 15
+  decimal places."
+- "Left means collapse: the better answer takes 100%. Right means everyone gets
+  almost the same share. α = 1, the dashed line, is the paper's fix."
+- Right figure: "Five answers, rewards 5 down to 1. As α grows, the bars even
+  out. At α = 1 each answer's share is exactly its reward over the total."
 
-**Right side (the key result, slow down here).**
-- "A group of G samples sees a rare answer at most once. So it can never estimate
-  p below 1/G, and the boost 1/p^α has a **cap**."
+*Demo (20 s): `#tetra`, "Ideal flow". Drag α and watch the dot move.*
+
+## Slide 18: Results (2/3): Speed and step size
+
+- Left: "The dots are the speeds we measured. The lines are what the eigenvalues
+  predicted, before running anything. They agree within 0.002% for two answers
+  (0.09% for five)."
+- Right: "The largest safe step for each α. The markers, found by bisection, sit
+  on the theory lines. The dotted line is Part 1's step, 0.05: it becomes unsafe
+  above α = 2.06."
+- Bottom line: "Both ends of the dial are hard. At small α the speeds differ by
+  a million times, called a stiff problem. At α = 0 there's no speed at all: the
+  losing answer fades like 1/t."
+
+## Slide 19: Results (3/3): A small group caps the boost (the key result)
+
+- "Real training sees only G samples. A rare answer shows up at most once, so
+  its probability is never estimated below 1/G. The boost has a cap: G to the
+  power α."
 - "The weaker answer survives only if the cap is bigger than the reward ratio.
-  That's the boxed formula."
-- Point at the table: "Rewards 4 and 1. With a group of 16, α must be above 0.5.
-  With a group of 4, α must be above 1."
-- "So with G = 4, even the paper's own α = 1 is **not enough**. The weaker answer
-  dies."
-- "This rule is our own result. The paper only tried a few group sizes; it never
-  gave a rule."
+  That's the boxed formula, and it's our own result."
+- Middle figure: "Rewards 4 and 1. With groups of 16 or 64 (orange, green), the
+  simulations follow the ideal curve. With a group of 4 (blue), the better answer
+  keeps 100% until α passes 1: the weaker answer is dead. So even the paper's
+  α = 1 is not enough with G = 4."
+- Right figure: "Colour shows how much of the weaker answer survives, for every
+  α and group size. White means dead. The dashed line is our formula, and it
+  traces the edge."
 
-*Demo (40 s): `#ceiling`. With G = 16, α = 1, ρ = 4 the curve flattens at 16,
-and 16 > 4 gives a green "survives". Set G = 4: the cap equals 4 and the chip
-turns to "dies".*
+*Demo (40 s): `#ceiling`. G = 16, α = 1, ρ = 4 gives a green "survives"; G = 4
+turns it to "dies". Or use `#tetra` in "Sampled groups" with 5 5 5 1, α = 0.55,
+G = 4: O4 dies. Raise G to 32 and it comes back.*
 
 > Hand-over to Sadia: "I found the end point by running the simulation for a long
 > time. Sadia solves for it directly, and shows the cap matters even more with
@@ -104,9 +130,9 @@ turns to "dies".*
 
 ---
 
-## Slide 31: "Overall Findings" (divider)
+## Slide 33: "Overall Findings" (divider)
 
-## Slide 32: Comparative Analysis
+## Slide 34: Comparative Analysis
 
 Read the table one row at a time: "the paper did this, we added this."
 
@@ -123,7 +149,7 @@ Read the table one row at a time: "the paper did this, we added this."
 > more computing. We reproduced the mechanism in a small model where nothing else
 > can explain the result."
 
-## Slide 33: Cross-Cutting Result, the cap
+## Slide 35: Cross-Cutting Result, the cap
 
 - "The dashed line is the ideal boost: it keeps growing as an answer gets rarer.
   The solid lines are what a real group of 16 or 64 can give. They flatten,
@@ -137,7 +163,7 @@ Read the table one row at a time: "the paper did this, we added this."
 *Demo (60 s): `#recap`. Click the four cards in order; each opens that part's
 demo. Just point at the one number on each card.*
 
-## Slide 34: Conclusions and Limitations
+## Slide 36: Conclusions and Limitations
 
 **Advice (left).**
 1. "Choose the group size first. If the cap is smaller than best reward divided
@@ -197,5 +223,5 @@ literature and didn't find this rule stated elsewhere."
 
 ## Timing
 
-Part 2: about 4 minutes, including 2 minutes of demos. Overall findings: about 3
-minutes plus 1 minute of demo. If time is short, skip `#amp` and `#ifd`.
+Part 2: about 5 minutes (six slides), including 1.5 minutes of demos. Overall findings: about 3
+minutes plus 1 minute of demo. If time is short, skip the `#tetra` demo on slide 17 and `#ifd`.

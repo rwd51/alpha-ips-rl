@@ -9,6 +9,7 @@
 
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
+\usepackage{graphicx}
 \usepackage{array}
 \usepackage{tikz}
 \usepackage{pgfplots}
@@ -541,60 +542,37 @@ size can overshoot. Part 2 is where instability appears.
 \begin{frame}{Part 2: Objective}
 
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.48\textwidth}
+\begin{column}{0.44\textwidth}
 \footnotesize
-\textbf{The idea.} The paper divides each reward by $p$. We divide by
-$p^{\alpha}$ instead, so $\alpha$ becomes a \alert{dial}:
-\begin{itemize}\setlength\itemsep{1pt}
-  \item $\alpha=0$: no fix, one answer takes everything.
-  \item $\alpha=1$: the paper's fix, share matches reward.
-  \item large $\alpha$: shares become almost equal.
-\end{itemize}
+\textbf{What training does.} The model gives each answer a probability. At
+every step, answers that earn more reward are pushed up. Training ends when
+nothing changes any more.
 
 \medskip
-\textbf{Where training ends up.} Training stops when every answer earns the
-same corrected reward $r_i/p_i^{\alpha}$. That gives
-\alert{$p_i^\star \propto r_i^{1/\alpha}$}.
+\textbf{Our change.} The paper divides each reward by $p$. We divide by
+$p^{\alpha}$, so $\alpha$ is a \alert{dial}. Training then ends at
+\[
+  p_i^\star \propto r_i^{1/\alpha}.
+\]
 
-\medskip
 \textbf{Our four questions.}
 \begin{enumerate}\setlength\itemsep{0pt}
-  \item Does training really end up there?
+  \item Does training really end there?
   \item How fast does it get there?
-  \item How big a step can the solver take?
+  \item How big a solver step is safe?
   \item What changes with a small sample group?
 \end{enumerate}
 \end{column}
 
-\begin{column}{0.49\textwidth}
+\begin{column}{0.54\textwidth}
 \centering
-\vspace{-4mm}
-\begin{tikzpicture}[scale=0.92, transform shape]
-\begin{axis}[
-  width=6.0cm, height=4.2cm, scale only axis,
-  xlabel={dial $\alpha$}, ylabel={share of the better answer},
-  xmode=log, xmin=0.28, xmax=5.5, ymin=0.5, ymax=1.03,
-  xtick={0.3,0.5,1,2,5}, xticklabels={0.3,0.5,1,2,5},
-  ytick={0.5,0.6,0.7,0.8,0.9,1.0},
-  label style={font=\tiny}, tick label style={font=\tiny},
-  axis line style={mTeal!60}, grid=major, grid style={mTeal!12},
-  legend style={font=\tiny, draw=none, fill=none, at={(0.98,0.97)}, anchor=north east},
-]
-  \addplot[mOrange, very thick, domain=0.28:5.5, samples=120]
-    {(4^(1/x))/((4^(1/x))+1)};
-  \addlegendentry{rewards 4 and 1}
-  \addplot[mBlue, thick, dashed, domain=0.28:5.5, samples=120]
-    {(2^(1/x))/((2^(1/x))+1)};
-  \addlegendentry{rewards 2 and 1}
-  \addplot[only marks, mark=*, mark size=1.4pt, mTeal]
-    coordinates {(0.5,0.941176) (1,0.8) (2,0.666667)};
-\end{axis}
-\end{tikzpicture}
+\vspace{-3mm}
+\includegraphics[height=5.3cm]{figures/exp2_fig1a.png}
 
-\vspace{1mm}
 {\scriptsize\raggedright
-Dots: our predicted splits $94/6$, $80/20$, $67/33$. The simulation lands on
-the curve to machine precision ($7.5\times10^{-15}$).\par}
+Two answers with rewards 4 and 1, starting at 50/50. Each curve is one training
+run: the better answer's share over time. Each $\alpha$ ends at a different
+share: $100\%$ at $\alpha=0$, $94\%$ at $0.5$, $80\%$ at $1$, $67\%$ at $2$.\par}
 \end{column}
 \end{columns}
 \end{frame}
@@ -602,58 +580,39 @@ the curve to machine precision ($7.5\times10^{-15}$).\par}
 % --------------------------------------------------------------- P2.2
 \begin{frame}{Part 2: Numerical Methods (1/2)}
 
-\footnotesize
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.49\textwidth}
-
-\textbf{Differential equations.}
-Training is an ODE, $\dot z=f(z)$. Setting $\dot z=0$ gives the end point
-$p^\star\propto r^{1/\alpha}$.
-
-\medskip
-\textbf{Eigenvalues: how fast training settles.}
-Near the end point the error shrinks like $e^{-\lambda t}$. The rates
-$\lambda$ are the eigenvalues of one matrix, the Jacobian:
-\[
-  J^\star=-\alpha\lVert r\rVert_{1/\alpha}\,
-  \bigl(\mathrm{diag}\,p^\star-p^\star p^{\star\top}\bigr).
-\]
-Big $\lambda$ means fast, small $\lambda$ means slow.
-
-\smallskip
-One eigenvalue is always $0$: adding the same number to every logit
-changes nothing, so nothing pulls back in that direction.
-
-\end{column}
 \begin{column}{0.47\textwidth}
-
-\textbf{Least squares: measuring the rate.}
-On a log scale the error is a straight line. Its slope is the rate. We fit the
-slope and compare it with the eigenvalue.
-
-\medskip
-\textbf{Round-off error: where to fit.}
-Only between $10^{-6}$ and $10^{-12}$. Above that the line is not straight
-yet; below it the computer's precision floor takes over.
+\footnotesize
+\textbf{Differential equations.} Training is an ODE, $\dot z=f(z)$. Setting
+$\dot z=0$ gives the end point.
 
 \medskip
-\begin{tikzpicture}[scale=0.9, transform shape]
-\begin{axis}[
-  width=4.6cm, height=2.6cm, scale only axis,
-  xlabel={time $t$}, ylabel={error},
-  ymode=log, xmin=0, xmax=12, ymin=1e-16, ymax=3,
-  ytick={1e-15,1e-10,1e-5,1}, xtick={0,6,12},
-  label style={font=\tiny}, tick label style={font=\tiny},
-  axis line style={mTeal!60},
-]
-  \addplot[mOrange, very thick, domain=0:12, samples=200]
-    {max(exp(-3.2*x), 1e-13)};
-  \addplot[mGrey, dashed, domain=0:12, samples=2]{1e-13};
-  \node[font=\tiny, text=mGrey, anchor=south east]
-    at (axis cs:11.7,4e-12) {precision floor};
-\end{axis}
-\end{tikzpicture}
+\textbf{Eigenvalues: the speed.} Near the end point the error shrinks like
+$e^{-\lambda t}$. The speeds $\lambda$ are the eigenvalues of the Jacobian
+\[
+  J^\star=-\alpha\lVert r\rVert_{1/\alpha}\bigl(\mathrm{diag}\,p^\star-p^\star p^{\star\top}\bigr).
+\]
+One eigenvalue is always $0$: adding the same number to every score changes
+nothing.
 
+\medskip
+\textbf{Least squares: measuring the speed.} Fit the slope of the log error.
+
+\medskip
+\textbf{Round-off: where to fit.} Only between $10^{-6}$ and $10^{-12}$, before
+the precision floor.
+\end{column}
+
+\begin{column}{0.51\textwidth}
+\centering
+\vspace{-3mm}
+\includegraphics[height=5.3cm]{figures/exp2_fig2a.png}
+
+{\scriptsize\raggedright
+Distance from the end point $p^\star$ (log scale), rewards 2 and 1. Time is
+multiplied by each run's \emph{predicted} speed $\lambda$ (0.36 to 45.6), so if
+the prediction is right all four lines share one slope. They do. Grey band:
+fit window. Flat tails: precision floor.\par}
 \end{column}
 \end{columns}
 \end{frame}
@@ -661,112 +620,130 @@ yet; below it the computer's precision floor takes over.
 % --------------------------------------------------------------- P2.3
 \begin{frame}{Part 2: Numerical Methods (2/2)}
 
-\footnotesize
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.5\textwidth}
-
-\textbf{Stability: how big a step?}
-Each solver step multiplies the error by some factor. If that factor is bigger
-than 1, the error grows every step and the run blows up. Safe steps:
+\begin{column}{0.47\textwidth}
+\footnotesize
+\textbf{Stability: how big a step?} Each step multiplies the error by a factor.
+Above 1, the error grows and the run blows up. Safe steps:
 \[
-  h\lambda_{\max} < 2 \;\;(\text{Euler}),
-  \qquad
-  h\lambda_{\max} < 2.785\;\;(\text{RK4}).
+  h\lambda_{\max} < 2 \;(\text{Euler}),\qquad h\lambda_{\max} < 2.785\;(\text{RK4}).
 \]
 
-\textbf{Root finding: bisection.}
-The RK4 limit $2.785$ is the root of $x^3-4x^2+12x-24=0$. We computed it by
-\alert{bisection} instead of looking it up.
-
-\smallskip
-Then we used bisection on the real simulation to find the largest step that
-still settles. It matches the theory to within $0.03\%$.
-
-\end{column}
-\begin{column}{0.46\textwidth}
-
-\textbf{Random sampling: real training.}
-Real training does not know $p$. It draws a group of $G$ samples and counts
-them:
-\[
-  G\hat p_i \sim \mathrm{Binomial}(G,p_i).
-\]
-Averaging over many groups gives an \alert{effective weight} $w_G(p)$ that
-takes the place of $p^{-\alpha}$. The end point then solves
-\[
-  r_i\,w_G(p_i)=S ,
-\]
-again by bisection.
+\textbf{Bisection.} $2.785$ is the root of $x^3-4x^2+12x-24=0$, found by
+bisection. Bisection on the real simulation finds the largest safe step; it
+matches the theory within $0.03\%$.
 
 \medskip
-\textbf{Checking the model.} Every random simulation is compared against this
-average prediction.
+\textbf{Random sampling.} Real training only sees $G$ samples:
+$G\hat p_i \sim \mathrm{Binomial}(G,p_i)$. Averaging over groups gives an
+\alert{effective weight} $w_G(p)$ in place of $p^{-\alpha}$. The end point solves
+$r_i\,w_G(p_i)=S$, by bisection. Simulations are checked against it.
+\end{column}
 
+\begin{column}{0.51\textwidth}
+\centering
+\vspace{-3mm}
+\includegraphics[height=5.3cm]{figures/exp2_fig3c.png}
+
+{\scriptsize\raggedright
+Rewards 4 and 1, $\alpha=2$, so $\lambda=8$. Euler with $h=0.3$ ($h\lambda=2.4>2$)
+jumps between 0 and 1. RK4 with the same step settles, and so does Euler with
+$h=0.2$.\par}
 \end{column}
 \end{columns}
 \end{frame}
 
 % --------------------------------------------------------------- P2.4
-\begin{frame}{Part 2: Results and Analysis}
+\begin{frame}{Part 2: Results (1/3): The Dial Works}
 
-\footnotesize
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.49\textwidth}
-\textbf{1. The dial works, and we can predict the speed.}
-Measured speed against the eigenvalue: within \hit{$0.002\%$} over 27 runs.
-
-\medskip
-\textbf{2. Both ends of the dial are hard to simulate.}
-
+\begin{column}{0.5\textwidth}
 \centering
-{\scriptsize
-\begin{tabular}{@{}lccc@{}}
-\toprule
-$\alpha$ & slowest rate & fastest rate & fast / slow \\
-\midrule
-0.1 & $5.8\times10^{-8}$ & 0.089 & $1.5\times10^{6}$ \\
-1   & 1.15 & 4.53 & 3.9 \\
-5   & $7.2\times10^{3}$ & $9.3\times10^{3}$ & 1.3 \\
-\bottomrule
-\end{tabular}}
+\includegraphics[height=5.2cm]{figures/exp2_fig1b.png}
 
-\raggedright\smallskip
-Small $\alpha$: the rates differ by a million times (a \alert{stiff}
-problem). Large $\alpha$: every rate is huge, so the step must be tiny. Part 1's
-step $h=0.05$ blows up above $\alpha=2.06$.
-
-\medskip
-\textbf{3. At $\alpha=0$ there is no rate at all.} The losing answer fades like
-$1/t$ (measured slope $-1.007$), not exponentially.
+{\scriptsize\raggedright
+Final share of the better answer against $\alpha$, for three reward pairs.
+Circles are simulations, lines are the formula; they agree to
+\hit{$7.5\times10^{-15}$}. ``94/6'' means the better answer ends with $94\%$ and
+the worse with $6\%$.\par}
 \end{column}
 
 \begin{column}{0.48\textwidth}
-\textbf{4. The key result: a small group caps the boost.}
+\centering
+\includegraphics[height=5.2cm]{figures/exp2_fig1c.png}
+
+{\scriptsize\raggedright
+Five answers, rewards 5, 4, 3, 2, 1. A bigger $\alpha$ spreads the probability
+more evenly. At $\alpha=1$ it is exactly reward over total reward.\par}
+\end{column}
+\end{columns}
+\end{frame}
+
+% --------------------------------------------------------------- P2.5
+\begin{frame}{Part 2: Results (2/3): Speed and Step Size}
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.5\textwidth}
+\centering
+\includegraphics[height=4.8cm]{figures/exp2_fig2b.png}
+
+{\scriptsize\raggedright
+Measured speed (dots) against the eigenvalue prediction (lines): within
+\hit{$0.002\%$} for two answers, $0.09\%$ for five.\par}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[height=4.8cm]{figures/exp2_fig3b.png}
+
+{\scriptsize\raggedright
+Largest safe step: bisection (markers) lands on the theory lines. Part 1's step
+$h=0.05$ blows up above $\alpha=2.06$.\par}
+\end{column}
+\end{columns}
+
+\vspace{2mm}
+{\footnotesize
+Both ends of the dial are hard. Small $\alpha$: speeds differ by up to a million
+times (\alert{stiff}). At $\alpha=0$ there is no speed at all: the loser fades
+like $1/t$.\par}
+\end{frame}
+
+% --------------------------------------------------------------- P2.6
+\begin{frame}{Part 2: Results (3/3): A Small Group Caps the Boost}
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.36\textwidth}
+\footnotesize
 A group of $G$ samples sees a rare answer at most once, so it never estimates
-$p$ below $1/G$. The boost $1/p^{\alpha}$ is capped:
+$p$ below $1/G$. The boost is capped:
 \[
-  \text{boost} \le \min\{G,1/\varepsilon\}^{\alpha}.
+  \text{boost}\le\min\{G,1/\varepsilon\}^{\alpha}.
 \]
 The weaker answer survives only if the cap beats the reward ratio:
 \[
-  \boxed{\;\alpha > \frac{\ln(r_1/r_2)}{\ln\min\{G,1/\varepsilon\}}\;}
+  \boxed{\alpha>\frac{\ln(r_1/r_2)}{\ln\min\{G,1/\varepsilon\}}}
 \]
+\bad{With $G=4$, the paper's $\alpha=1$ is not enough.}
+\end{column}
 
+\begin{column}{0.31\textwidth}
 \centering
-{\scriptsize\setlength\tabcolsep{4pt}
-\begin{tabular}{@{}lccccc@{}}
-\toprule
-$G$ & 4 & 8 & 16 & 32 & 64 \\
-\midrule
-$\alpha$ needed (rewards 4, 1) & 1.0 & 0.667 & 0.5 & 0.4 & 0.333 \\
-\bottomrule
-\end{tabular}}
+\includegraphics[width=\linewidth]{figures/exp2_fig4b.png}
 
-\raggedright\smallskip
-\medskip
-\bad{With $G=4$ the paper's $\alpha=1$ is not enough}: the weaker answer dies
-(better answer's share $0.9965$, not $0.8$). Simulations match the
-prediction to $0.013$.
+{\scriptsize\raggedright
+Rewards 4 and 1. Circles are simulations with groups of 4, 16, 64; lines are
+our prediction. With $G=4$ the weaker answer is dead (share $1.0$) until
+$\alpha$ passes 1.\par}
+\end{column}
+
+\begin{column}{0.31\textwidth}
+\centering
+\includegraphics[width=\linewidth]{figures/exp2_fig4c.png}
+
+{\scriptsize\raggedright
+How much of the weaker answer survives, over $\alpha$ and $G$. The dashed line
+is our formula $\alpha_c=\ln 4/\ln G$: it traces the edge.\par}
 \end{column}
 \end{columns}
 \end{frame}
