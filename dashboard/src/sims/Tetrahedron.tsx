@@ -101,6 +101,11 @@ function createEngine(): Engine<Params> {
     const q = pos(pStar(r, a));
     marker.position.set(...q);
     glow.position.set(...q);
+    // at exactly alpha = 0 a tie at the top has no single end point (every mix of the
+    // tied outcomes is at rest), so the alpha -> 0 limit would be a misleading dot
+    const noEnd = a === 0 && topTie(r).length > 1;
+    marker.visible = !noEnd;
+    glow.visible = !noEnd;
     const pts3: THREE.Vector3[] = [];
     for (let k = 0; k <= 120; k++) pts3.push(new THREE.Vector3(...pos(pStar(r, Math.pow(10, -1.7 + (k * 3.4) / 120)))));
     setLinePoints(pathLine, pts3);
@@ -394,22 +399,31 @@ export function Tetrahedron() {
       ) : (
         <Readouts
           items={[
-            ["stationary p*", ps.map((v) => v.toFixed(3)).join("  ")],
-            ["entropy H/ln 4", entropyN(ps).toFixed(3)],
+            [
+              "stationary p*",
+              alpha === 0 && tied.length > 1 ? "none: any mix of the tied answers stays put" : ps.map((v) => v.toFixed(3)).join("  "),
+            ],
+            ["entropy H/ln 4", alpha === 0 && tied.length > 1 ? "—" : entropyN(ps).toFixed(3)],
           ]}
         />
       )}
       <Notes
         tryThis={[
-          "Tie race, rewards 5 5 5 1, α = 0: every run is coloured by whichever of O1, O2, O3 it started ahead on, and each colour ends in its own corner. Equal rewards, yet the likelier twin takes everything.",
-          "Same race at α = 0.02: the colours pull apart until t ≈ 10 (the leader's share of the tie rises to about 0.63), then drift back to an even split by t ≈ 1000. A small α looks like collapse for a while, then wins.",
-          "Sampled groups, 1 1 1 1, α = 0: pure noise drives runs to faces, then edges, then corners (genetic drift in 3-D).",
+          "Ideal flow, rewards 4 3 2 1, α = 1: every run ends at the glowing dot (0.4, 0.3, 0.2, 0.1). Share matches reward.",
+          "Tie race, rewards 5 5 5 1, α = 0: each run is coloured by which of O1, O2, O3 started slightly ahead, and each colour ends in its own corner. Equal rewards, yet the early leader takes everything. There is no glowing dot here, because at α = 0 a tie has no single end point.",
+          "Same race at α = 0.3: all colours meet in the middle of the O1–O2–O3 face. The dial gives the trailing twin a helping hand. At α = 0.02 the same thing happens, only slowly: the colours first pull apart, then come back by t ≈ 1000.",
+          "Sampled groups, 5 5 5 1, α = 0.55, G = 4: O4 dies even though the dot keeps 1.8% for it. A group of 4 can boost a rare answer at most 4^0.55 ≈ 2.1 times, less than the reward ratio 5. Raise G to 32 (cap 6.7) and O4 comes back.",
         ]}
         math={
           <>
-            For two tied outcomes, d/dt ln(p₁/p₂) = (p₁ − p₂)(r − r̄) at α = 0: whichever is already likelier grows faster, as long as some worse outcome keeps
-            r̄ below r, so the ordering can never flip. Any α &gt; 0 adds restoring terms of order α (from p<sup>1−α</sup> ≈ p(1 − α ln p)) that pull back
-            toward the even split. The orange curve is p*(α).
+            <b>The three modes.</b> Ideal flow: training that knows the exact probabilities, so paths are smooth. Sampled groups: realistic training that
+            only sees G samples per step, so paths jitter, and a small group caps how much a rare answer can be helped. Tie race: all runs start together
+            in the middle, to see which of several equally good answers wins.
+            <br />
+            <b>Why the early leader wins at α = 0.</b> Each answer grows in proportion to its own probability. For two tied answers, d/dt ln(p₁/p₂) = (p₁ −
+            p₂)(r − r̄), where r̄ is the average reward. A worse answer keeps r̄ below r, so if p₁ &gt; p₂ the gap only widens. With α &gt; 0 the push uses
+            p<sup>1−α</sup> instead of p, which helps the smaller one relatively more, so the tie evens out. The orange curve shows where the end point sits
+            for each α.
           </>
         }
       />
