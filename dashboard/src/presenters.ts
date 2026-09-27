@@ -31,7 +31,7 @@ export const PARTS: Part[] = [
   {
     id: "part2",
     label: "Part 2",
-    slides: "slides 13–17",
+    slides: "slides 13–19",
     title: "The diversity exponent",
     presenter: "Mohammad Raihan Rashid",
     roll: "2105046",
@@ -45,7 +45,7 @@ export const PARTS: Part[] = [
   {
     id: "part3",
     label: "Part 3",
-    slides: "slides 18–21",
+    slides: "slides 20–23",
     title: "Root finding",
     presenter: "Sadia Binte Sayeed",
     roll: "2105045",
@@ -58,7 +58,7 @@ export const PARTS: Part[] = [
   {
     id: "part4",
     label: "Part 4",
-    slides: "slides 22–25",
+    slides: "slides 24–27",
     title: "Parameter atlas",
     presenter: "Md. Mehedi Hasan",
     roll: "2105052",
@@ -71,7 +71,7 @@ export const PARTS: Part[] = [
   {
     id: "part5",
     label: "Part 5",
-    slides: "slides 26–30",
+    slides: "slides 28–32",
     title: "Estimator error",
     presenter: "Ahnaf Tahmid",
     roll: "2105041",
@@ -84,7 +84,7 @@ export const PARTS: Part[] = [
   {
     id: "closing",
     label: "Overall",
-    slides: "slides 31–34",
+    slides: "slides 33–36",
     title: "Overall findings",
     presenter: "Mohammad Raihan Rashid",
     roll: "2105046",

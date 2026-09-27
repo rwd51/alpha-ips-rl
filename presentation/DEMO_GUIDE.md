@@ -31,11 +31,11 @@ npm run dev      # then open http://localhost:5173
 |---|---|---|---|
 | Opening | 2–8 | whoever opens | hero triangle (`top`) |
 | 1 · Collapse baseline | 9–12 | Ruwad Naswan | outcome race (`race`), balls into bins (`balls`), collapse clock (`clock`) |
-| 2 · The diversity exponent | 13–17 | Mohammad Raihan Rashid | tetrahedron (`tetra`), Euler vs RK4 (`stab`), amplification landscape (`amp`), weight ceiling (`ceiling`) |
-| 3 · Root finding | 18–21 | Sadia Binte Sayeed | root-finder race (`roots`), Newton's tangent hops (`newton`), nested solver (`nested`) |
-| 4 · Parameter atlas | 22–25 | Md. Mehedi Hasan | survival surface (`surface`), phase atlas (`atlas`), interpolation audit (`interp`) |
-| 5 · Estimator error | 26–30 | Ahnaf Tahmid | estimator lab (`est`), what the dynamics see (`distort`), EMA oscillator (`ema`) |
-| Overall findings | 31–34 | Mohammad Raihan Rashid | one ceiling, four views (`recap`), foragers (`ifd`) |
+| 2 · The diversity exponent | 13–19 | Mohammad Raihan Rashid | tetrahedron (`tetra`), Euler vs RK4 (`stab`), amplification landscape (`amp`), weight ceiling (`ceiling`) |
+| 3 · Root finding | 20–23 | Sadia Binte Sayeed | root-finder race (`roots`), Newton's tangent hops (`newton`), nested solver (`nested`) |
+| 4 · Parameter atlas | 24–27 | Md. Mehedi Hasan | survival surface (`surface`), phase atlas (`atlas`), interpolation audit (`interp`) |
+| 5 · Estimator error | 28–32 | Ahnaf Tahmid | estimator lab (`est`), what the dynamics see (`distort`), EMA oscillator (`ema`) |
+| Overall findings | 33–36 | Mohammad Raihan Rashid | one ceiling, four views (`recap`), foragers (`ifd`) |
 
 Five of these are new in this version, so that every part has at least three
 demos: `clock`, `roots`, `nested`, `interp` and `distort`. Each one was checked
@@ -111,7 +111,7 @@ started ahead on.
 
 ---
 
-## Part 2 · Mohammad Raihan Rashid (slides 13–17)
+## Part 2 · Mohammad Raihan Rashid (slides 13–19)
 
 ### Four outcomes, one tetrahedron, `#tetra` (Exp 2), 3-D
 
@@ -123,9 +123,13 @@ rotate.
    (0.4, 0.3, 0.2, 0.1).
 2. Drag α down: the orange curve is p\*(α), and the dot slides toward the O1
    corner.
-3. "Tie race", rewards 5 5 5 1: at α = 0 every colour ends in its own corner. At
-   α = 0.02 the colours first pull apart, then drift back to an even split by
-   t ≈ 1000.
+3. "Tie race", rewards 5 5 5 1: at α = 0 every colour ends in its own corner
+   (no glowing dot: at α = 0 a tie has no single end point). At α = 0.3 all
+   colours meet in the middle; at α = 0.02 they first pull apart, then come
+   back to an even split by t ≈ 1000.
+4. For slide 19: "Sampled groups", rewards 5 5 5 1, α = 0.55, G = 4. O4 dies
+   even though the dot keeps 1.8% for it, because a group of 4 can boost it
+   at most 4^0.55 ≈ 2.1 times, less than 5. Raise G to 32 and it comes back.
 
 ### Euler vs RK4, `#stab` (Exp 1 Fig 3, Exp 2 Fig 3c)
 
@@ -155,13 +159,13 @@ p^−α. A probe draws one sampled group.
 **Script.**
 1. G = 16, α = 1, ρ = 4: the curve flattens at 16. Since 16 > 4, the weak outcome
    survives (green chip).
-2. G = 4: the ceiling is 4 = ρ, so it dies. This is slide 17's "at G = 4 the
+2. G = 4: the ceiling is 4 = ρ, so it dies. This is slide 19's "at G = 4 the
    paper's own α = 1 fails" (long-run p₁ = 0.9965 instead of 0.8).
 3. Raise ε above 1/G: the clip, not the group, now sets the ceiling.
 
 ---
 
-## Part 3 · Sadia Binte Sayeed (slides 18–21)
+## Part 3 · Sadia Binte Sayeed (slides 20–23)
 
 ### The root-finder race, `#roots` (Exp 3 Fig 1a), new
 
@@ -170,7 +174,7 @@ balance and log forms, all solving the same K = 2 condition. The strip below
 shows where each iterate sits relative to u\*.
 
 **Script.**
-1. Defaults α = 1, ρ = 4, u₀ = 0 are slide 21's setting. The readouts show
+1. Defaults α = 1, ρ = 4, u₀ = 0 are slide 23's setting. The readouts show
    **bisection 56 (linear, ratio ≈ 0.5), secant 9 at order 1.61, Newton on the
    drift 5 at order 2.00, balance 6, log 1**.
 2. Slide u₀ to 4: Newton on the drift runs off to infinity (arrow at the edge),
@@ -201,16 +205,16 @@ the outer residual per iteration for Newton/Newton against bisection/bisection.
 
 **Script.**
 1. α = 1, G = 16: all five survive. The weakest one's threshold is **0.886, not
-   the pairwise 0.580** (slide 21 table: 0.0805, 0.203, 0.419, 0.886; the demo
+   the pairwise 0.580** (slide 23 table: 0.0805, 0.203, 0.419, 0.886; the demo
    computes the same four values).
 2. Drop G to 5: the fifth outcome reads "lost at every α" (it needs G ≥ 6).
 3. Point at the residual chart: Newton reaches 10⁻¹⁵ in about 8 outer steps,
-   against about 41 for bisection, roughly 28× less total work. Slide 21 quotes
+   against about 41 for bisection, roughly 28× less total work. Slide 23 quotes
    8–20× from the repository's solver, whose tolerances are different.
 
 ---
 
-## Part 4 · Md. Mehedi Hasan (slides 22–25)
+## Part 4 · Md. Mehedi Hasan (slides 24–27)
 
 ### Survival surface, `#surface` (Exp 2 Fig 4c, Exp 4 Fig 1), 3-D
 
@@ -221,7 +225,7 @@ the outer residual per iteration for Newton/Newton against bisection/bisection.
 1. α = 1, ε = 10⁻³: the plane cuts the surface along G = ρ^(1/α). Set G = 16,
    ρ = 4: needed α_c = 0.5, so it survives.
 2. Raise ε to 0.3: past G = 1/ε the surface turns into a plateau. With ε = 0.3
-   the ceiling is 3.33 < 4, so no group size rescues ρ = 4 (slide 25's second
+   the ceiling is 3.33 < 4, so no group size rescues ρ = 4 (slide 27's second
    table).
 
 ### Phase atlas, `#atlas` (Exp 4 Figs 1a, 2a)
@@ -259,7 +263,7 @@ the kink-free RMSE.
 
 ---
 
-## Part 5 · Ahnaf Tahmid (slides 26–30)
+## Part 5 · Ahnaf Tahmid (slides 28–32)
 
 ### Estimator lab, `#est` (Exp 5 Figs 1–2)
 
@@ -270,7 +274,7 @@ live samples. Below it, MSE against ε.
 1. p = 0.1, G = 16: the empty group (probability 0.19, weight 1/ε = 1000) sits far
    right and carries most of the error.
 2. Slide ε: MSE falls, then rises, with the minimum exactly at ε = p (the star).
-   This is slide 30's ε\* = p.
+   This is slide 32's ε\* = p.
 
 ### What the dynamics actually see, `#distort` (Exp 5 Fig 4, Fig 3c), new
 
@@ -284,7 +288,7 @@ against G at a fixed p.
    (error of order 1/(Gp)).
 2. Readouts at α = 1: clip "faster than any power", Richardson "order ≈ 1 in
    1/G". The better estimator gives the dynamics a first-order error that the
-   clip does not have. That is slide 30's "the better estimator trains worse"
+   clip does not have. That is slide 32's "the better estimator trains worse"
    (G = 64: 0.0016 for the clip against 0.0294 for Richardson).
 3. Move α to 2: the clip picks up its own 1/G term, and the α-matched offset
    becomes the best rule (order 2).
@@ -297,19 +301,19 @@ spring. The roots of s² + κs + κλ lie on a circle.
 **Script.**
 1. Small κ: the policy rings around p\* (underdamped).
 2. κ = 4λ: the roots meet at −2λ, the fastest settling (critical damping, slide
-   29).
+   31).
 3. Large κ: back to first-order behaviour.
 
 ---
 
-## Overall findings · Mohammad Raihan Rashid (slides 31–34)
+## Overall findings · Mohammad Raihan Rashid (slides 33–36)
 
 ### One ceiling, four views, `#recap`
 
 Four cards, one per part, each linking to the demo where that part meets the
-finite-group ceiling (slide 33). Click them in order: weight ceiling → nested
+finite-group ceiling (slide 35). Click them in order: weight ceiling → nested
 solver → survival surface → dynamics distortion. Under the cards are the four
-practitioner takeaways from slide 34, each linked to its demo.
+practitioner takeaways from slide 36, each linked to its demo.
 
 ### Foragers and patches, `#ifd` (analogy)
 
@@ -324,14 +328,14 @@ n ∝ r^(1/α), the same law as p\*. Good last demo before "Thank you".
 
 Mehedi's revision of Exp 4 (commit `9e8b7d6`, 27 Sep) changed some numbers that
 the Part 4 slides still quote (the deck was committed earlier the same day).
-Slide 25 is Mehedi's to update; slide 32 is already fixed.
+Slide 27 is Mehedi's to update; slide 34 is already fixed.
 
 | Slide | Deck says | RESULTS_exp4.md now says |
 |---|---|---|
-| 25 (Part 4 results) | misclassifications 0/19,125 | 0 mismatches at the 19,120 points with \|m\| > 10⁻⁹; the 5 points exactly on m = 0 are extinct, as the strict inequality requires |
-| 25 | worst stationarity residual 1.18 × 10⁻¹⁵ | max relative balance residual 5.92 × 10⁻¹⁵ |
-| 25 (interpolation audit) | smooth RMSE 2.5 × 10⁻³, order 1.58; near a kink 9.7 × 10⁻³, order 1.03 | kink-free cells RMSE 3.14 × 10⁻⁴, orders 2.19 and 1.86; kinked cells RMSE 1.02 × 10⁻², orders 1.01 and 1.21 (the old 1.58 mixed both regimes) |
-| 32 (comparative analysis) | verified at 0/19,125 misclassifications | fixed: now says "checked on 19,125 settings with no exceptions" |
+| 27 (Part 4 results) | misclassifications 0/19,125 | 0 mismatches at the 19,120 points with \|m\| > 10⁻⁹; the 5 points exactly on m = 0 are extinct, as the strict inequality requires |
+| 27 | worst stationarity residual 1.18 × 10⁻¹⁵ | max relative balance residual 5.92 × 10⁻¹⁵ |
+| 27 (interpolation audit) | smooth RMSE 2.5 × 10⁻³, order 1.58; near a kink 9.7 × 10⁻³, order 1.03 | kink-free cells RMSE 3.14 × 10⁻⁴, orders 2.19 and 1.86; kinked cells RMSE 1.02 × 10⁻², orders 1.01 and 1.21 (the old 1.58 mixed both regimes) |
+| 34 (comparative analysis) | verified at 0/19,125 misclassifications | fixed: now says "checked on 19,125 settings with no exceptions" |
 
-Slide 24 describes the kinks as "m = 0 and ε = 1/G". The revision found a kink
+Slide 26 describes the kinks as "m = 0 and ε = 1/G". The revision found a kink
 at every ε = k/G, not only at 1/G.
