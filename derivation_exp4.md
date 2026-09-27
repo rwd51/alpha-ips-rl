@@ -71,6 +71,20 @@ classification boundary to the single threshold $m=0$. It does **not** imply
 that the positive minority mass is a function of $m$ alone, because the full
 shape of $w_G(p)$ still depends on $G$, $\alpha$, and $\varepsilon$.
 
+Nor is a finite group a uniform under-correction. At $\alpha=1$ with
+$\varepsilon\leq1/G$ the weight has the closed form
+
+$$
+w_G(p)=\frac{1-(1-p)^G}{p}<\frac{1}{p},
+$$
+
+so both outcomes are under-weighted, the rarer one more (its deficit $(1-p)^G$
+is larger), and the minority always holds less mass than in the $G\to\infty$
+limit.  For large $\alpha$, however, $((1+B)/G)^{-\alpha}$ is strongly convex
+and its average over the binomial spread can exceed $p^{-\alpha}$, by more for
+the rarer outcome.  At moderate $G$ the minority can then hold *more* mass than
+in the limit; Figure 1a shows this at $\alpha=4$.
+
 ### Group-limited and clip-limited regimes
 
 The ceiling base is
@@ -161,30 +175,95 @@ $$
 
 It is exact at grid nodes and for every function that is affine in each
 coordinate separately.  For a twice-differentiable response, uniform linear
-interpolation normally has second-order error.  Here the stationary minority
-mass is continuous but has derivative kinks at
+interpolation has second-order error.  The stationary minority mass is
+continuous, but it has two kinds of derivative kink.
+
+**The extinction kink.** On the surface $m=0$ the minority mass leaves zero with
+a nonzero slope.
+
+**The clip kinks.** Write the size-biased weight term by term:
 
 $$
-m=0
-\quad\text{(extinction boundary)},
+w_G(p)=\sum_{n=0}^{G-1}\binom{G-1}{n}p^n(1-p)^{G-1-n}f_n(\varepsilon),
 \qquad
-\varepsilon=\frac{1}{G}
-\quad\text{(clip-activation boundary)}.
+f_n(\varepsilon)=\max\{\frac{1+n}{G},\varepsilon\}^{-\alpha}.
 $$
 
-Cells crossing either surface cannot retain the smooth second-order behavior.
-Experiment 4 therefore reports holdout RMSE both away from and near those
-boundaries instead of quoting one convergence rate without qualification.
+Term $n$ is constant for $\varepsilon\leq(1+n)/G$ and equals
+$\varepsilon^{-\alpha}$ above it, so each term switches on at its own threshold.
+Across $\varepsilon=k/G$ the slope of $w_G$ with respect to $\log\varepsilon$
+jumps by
+
+$$
+\Delta_k=-\alpha\,(\frac{k}{G})^{-\alpha}\,\Pr[B=k-1],
+\qquad B\sim\mathrm{Binomial}(G-1,p),
+\qquad k=1,\ldots,G-1.
+$$
+
+Every $k/G$ is a kink, not only the first one at $1/G$ where clipping switches
+on.  The jump is weighted by $\Pr[B=k-1]$, which peaks near
+$k-1\approx(G-1)p$, so for an outcome that is typically seen more than once per
+group the thresholds $2/G, 3/G,\ldots$ can matter more than $1/G$.  The
+stationary point inherits every kink of the balance function through the
+implicit-function theorem.  In the audited range, $G=16$ and
+$10^{-3}\leq\varepsilon\leq0.4$, there are six:
+$\varepsilon\in\{1/16,2/16,\ldots,6/16\}$.  Their spacing in $\log\varepsilon$
+shrinks from $\log 2=0.69$ to $\log(6/5)=0.18$, comparable to the $17$-point
+grid spacing of $0.37$, and on that grid every cell reaching above $1/G$
+contains at least one of them.
+
+**Attributing error to cells.** A multilinear interpolant uses only the $2^D$
+corners of the cell holding the query point, so what matters is whether a kink
+passes through that cell.  The margin $m$ increases with $\alpha$, decreases
+with $\rho$ and does not increase with $\varepsilon$, so over a box its extremes
+sit at two opposite corners:
+
+$$
+m_{\max}=m(\alpha_{\mathrm{hi}},\rho_{\mathrm{lo}},\varepsilon_{\mathrm{lo}}),
+\qquad
+m_{\min}=m(\alpha_{\mathrm{lo}},\rho_{\mathrm{hi}},\varepsilon_{\mathrm{hi}}).
+$$
+
+The extinction surface crosses the cell exactly when $m_{\min}<0<m_{\max}$.  A
+clip kink crosses it when some $k/G$ lies strictly inside the cell's
+$\varepsilon$ range and the minority survives somewhere in the cell
+($m_{\max}>0$); where $m\leq0$ throughout, the response is identically zero and
+has no kink at all.
+
+A fixed-width band around the kink surfaces is the wrong unit, because the
+affected region is one cell wide and shrinks as the grid is refined.  The
+$5$-, $9$- and $17$-point grids are nested, so a point whose $5$-point cell is
+kink-free, with the minority alive in it, stays in such cells at every level,
+and a kink inside a point's $17$-point cell lies inside all of its coarser
+cells too.  These two fixed
+populations give convergence orders that do not mix regimes.  Orders are
+reported between successive refinements,
+
+$$
+\text{order}=\log_2\frac{e_N}{e_{2N}},
+$$
+
+for RMSE $e_N$ on a grid with $N$ intervals per axis, rather than as one
+least-squares slope through three levels, which would hide pre-asymptotic
+behavior.
 
 ## Numerical safeguards specific to Experiment 4
 
-- The batched $K=2$ solver uses $64$ deterministic bisection iterations.
-- Forty stratified atlas cells are independently compared with the original
-  scalar `meanfield_stationary_K2` implementation.
+- The batched $K=2$ solver uses $64$ deterministic bisection iterations.  It
+  chooses between the collapsed and the interior branch from the margin $m$, so
+  its own output cannot test the boundary.
+- Every one of the $19{,}125$ atlas points is therefore re-solved with the
+  original scalar `meanfield_stationary_K2` of Experiment 2.  That solver
+  decides collapse from the sign of the balance function next to $p_1=1$ and
+  evaluates the weight as $\phi_G(p)/p$ from the direct binomial sum, so neither
+  $m$ nor the batched solver enters the phase classification.
+- The $K=2$ residual is measured relative to the size of the two balanced terms,
+  $\rho\,w_G(p_1)+w_G(p_2)$, not relative to the weight ceiling.
 - General $K$ solves are reward-normalized, checked against the conditions
   above, and rerun with pure bisection if safeguarded Newton fails validation.
-- Tensor interpolation is compared against SciPy in one through five
-  dimensions by the Experiment 4 test suite.
+- Tensor interpolation is compared against SciPy for scalar- and vector-valued
+  data in one through five dimensions, and the jump formula $\Delta_k$ is
+  checked numerically, by the Experiment 4 test suite.
 - The full script raises rather than writing a successful summary if phase
-  classification, stationarity, normalization, node exactness, or refinement
-  monotonicity fails.
+  classification, stationarity, normalization, node exactness, nesting of the
+  cell classification, or refinement monotonicity fails.

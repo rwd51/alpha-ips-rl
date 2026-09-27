@@ -2,8 +2,11 @@
 
 The numerical experiments repeatedly evaluate smooth (or piecewise smooth)
 quantities on Cartesian products of parameters.  This module keeps the grid
-bookkeeping and interpolation independent of any plotting code, and provides
-a vectorized K=2 finite-group stationary solver for large parameter sweeps.
+bookkeeping and interpolation independent of any plotting code, provides a
+vectorized K=2 finite-group stationary solver for large parameter sweeps, and
+locates the derivative kinks of that solution (the extinction surface m=0 and
+the clipping thresholds eps=k/G) so interpolation error can be attributed to
+the cells that contain them.
 
 The interpolation coordinates are deliberately supplied by the caller.  For
 positive parameters spanning decades, callers should normally construct a
@@ -115,6 +118,73 @@ class TensorGrid:
         """Multilinearly interpolate values at one or more query points."""
         return multilinear_interpolate(self.axes, values, points, bounds_error=bounds_error)
 
+    def cell_bounds(self, points: Array, bounds_error: bool = True) -> tuple[Array, Array]:
+        """Corner coordinates of the cell used to interpolate each point."""
+        return cell_bounds(self.axes, points, bounds_error=bounds_error)
+
+
+def _checked_query(checked: tuple[Array, ...], points: Array, bounds_error: bool) -> tuple[Array, bool]:
+    """Validate query points against validated axes; return (n, ndim) points."""
+    ndim = len(checked)
+    query = np.asarray(points, dtype=np.float64)
+    single = query.ndim == 1
+    if single:
+        query = query[None, :]
+    if query.ndim != 2 or query.shape[1] != ndim:
+        raise ValueError(f"points must have shape ({ndim},) or (n, {ndim})")
+    if not np.all(np.isfinite(query)):
+        raise ValueError("points contains a non-finite coordinate")
+    if bounds_error:
+        for dim, axis in enumerate(checked):
+            q = query[:, dim]
+            outside = (q < axis[0]) | (q > axis[-1])
+            if np.any(outside):
+                bad = q[np.flatnonzero(outside)[0]]
+                raise ValueError(
+                    f"point coordinate {bad:g} lies outside axis {dim} "
+                    f"range [{axis[0]:g}, {axis[-1]:g}]"
+                )
+    return query, single
+
+
+def _locate(axis: Array, q: Array) -> tuple[Array, Array, Array]:
+    """Cell [axis[lo], axis[hi]] holding each in-range coordinate, and the
+    fractional position t in it.  An interior node belongs to the cell on its
+    right; the last node belongs to the last cell."""
+    if len(axis) == 1:
+        lo = np.zeros(len(q), dtype=np.int64)
+        return lo, lo.copy(), np.zeros(len(q), dtype=np.float64)
+    hi = np.searchsorted(axis, q, side="right")
+    hi = np.clip(hi, 1, len(axis) - 1)
+    lo = hi - 1
+    return lo, hi, (q - axis[lo]) / (axis[hi] - axis[lo])
+
+
+def cell_bounds(
+    axes: Sequence[Sequence[float]],
+    points: Array,
+    *,
+    bounds_error: bool = True,
+) -> tuple[Array, Array]:
+    """Lower and upper corners of the cell that ``multilinear_interpolate``
+    uses for each query point.
+
+    Returns two arrays of shape ``(n, ndim)`` (``(ndim,)`` for a single
+    point).  With ``bounds_error=False`` coordinates are clipped to the grid,
+    exactly as in interpolation.
+    """
+    checked = tuple(_validated_axis(str(i), axis) for i, axis in enumerate(axes))
+    if not checked:
+        raise ValueError("at least one axis is required")
+    query, single = _checked_query(checked, points, bounds_error)
+    lower = np.empty_like(query)
+    upper = np.empty_like(query)
+    for dim, axis in enumerate(checked):
+        lo, hi, _ = _locate(axis, np.clip(query[:, dim], axis[0], axis[-1]))
+        lower[:, dim] = axis[lo]
+        upper[:, dim] = axis[hi]
+    return (lower[0], upper[0]) if single else (lower, upper)
+
 
 def multilinear_interpolate(
     axes: Sequence[Sequence[float]],
@@ -145,37 +215,13 @@ def multilinear_interpolate(
     if data.shape[:ndim] != expected:
         raise ValueError(f"values starts with shape {data.shape[:ndim]}, expected {expected}")
 
-    query = np.asarray(points, dtype=np.float64)
-    single = query.ndim == 1
-    if single:
-        query = query[None, :]
-    if query.ndim != 2 or query.shape[1] != ndim:
-        raise ValueError(f"points must have shape ({ndim},) or (n, {ndim})")
-    if not np.all(np.isfinite(query)):
-        raise ValueError("points contains a non-finite coordinate")
+    query, single = _checked_query(checked, points, bounds_error)
 
     lower: list[Array] = []
     upper: list[Array] = []
     fraction: list[Array] = []
-    for dim, axis in enumerate(checked):
-        q = query[:, dim]
-        outside = (q < axis[0]) | (q > axis[-1])
-        if bounds_error and np.any(outside):
-            bad = q[np.flatnonzero(outside)[0]]
-            raise ValueError(
-                f"point coordinate {bad:g} lies outside axis {dim} "
-                f"range [{axis[0]:g}, {axis[-1]:g}]"
-            )
-        q = np.clip(q, axis[0], axis[-1])
-        if len(axis) == 1:
-            lo = np.zeros(len(q), dtype=np.int64)
-            hi = lo.copy()
-            t = np.zeros(len(q), dtype=np.float64)
-        else:
-            hi = np.searchsorted(axis, q, side="right")
-            hi = np.clip(hi, 1, len(axis) - 1)
-            lo = hi - 1
-            t = (q - axis[lo]) / (axis[hi] - axis[lo])
+    for axis, q in zip(checked, query.T):
+        lo, hi, t = _locate(axis, np.clip(q, axis[0], axis[-1]))
         lower.append(lo)
         upper.append(hi)
         fraction.append(t)
@@ -282,3 +328,58 @@ def stationary_k2_batch(
             hi = np.where(balance > 0.0, hi, mid)
         result[active] = 0.5 * (lo + hi)
     return result.reshape(original_shape)
+
+
+def clip_kink_epsilons(group_size: int, eps_low: float = 0.0, eps_high: float = 1.0) -> Array:
+    """Clipping thresholds ``eps = k/G`` strictly inside ``(eps_low, eps_high)``.
+
+    ``w_G(p) = sum_n Binom(n; G-1, p) max((1+n)/G, eps)^-alpha``, and the n-th
+    term changes from a constant to ``eps^-alpha`` at its own ``eps = (1+n)/G``.
+    Every ``k/G`` (k = 1, ..., G-1) is therefore a derivative kink of ``w_G``,
+    and of the stationary point, as a function of eps -- not only ``1/G``.
+    """
+    if not isinstance(group_size, (int, np.integer)) or group_size < 2:
+        raise ValueError("group_size must be an integer >= 2")
+    if not (np.isfinite(eps_low) and np.isfinite(eps_high)) or eps_low >= eps_high:
+        raise ValueError("eps_low and eps_high must be finite with eps_low < eps_high")
+    kinks = np.arange(1, group_size) / float(group_size)
+    return kinks[(kinks > eps_low) & (kinks < eps_high)]
+
+
+def k2_cell_kinks(lower: Array, upper: Array, group_size: int) -> dict[str, Array]:
+    """Which derivative kinks of the K=2 finite-group minority mass a cell contains.
+
+    ``lower`` and ``upper`` are ``(n, 3)`` cell corners in the parameter
+    coordinates ``(alpha, reward_ratio, eps)``; exponentiate log-coordinate
+    corners first.  The margin m increases with alpha, decreases with the
+    reward ratio and does not increase with eps, so over a box its extremes
+    sit at two opposite corners.
+
+    Returns boolean arrays:
+      ``extinct``     m <= 0 on the whole cell: the minority mass is exactly
+                      zero there, so interpolating the cell is exact;
+      ``extinction``  the surface m = 0 passes through the cell;
+      ``clip``        some eps = k/G lies strictly inside the cell's eps range
+                      and the minority survives somewhere in the cell (inside
+                      an extinct cell the response is identically zero);
+      ``clean``       neither kink passes through the cell.
+    """
+    lower = np.atleast_2d(np.asarray(lower, dtype=np.float64))
+    upper = np.atleast_2d(np.asarray(upper, dtype=np.float64))
+    if lower.ndim != 2 or lower.shape[1] != 3 or lower.shape != upper.shape:
+        raise ValueError("lower and upper must both have shape (n, 3)")
+    if np.any(upper < lower):
+        raise ValueError("every upper corner must be >= its lower corner")
+    m_max = finite_group_margin(lower[:, 1], group_size, upper[:, 0], lower[:, 2])
+    m_min = finite_group_margin(upper[:, 1], group_size, lower[:, 0], upper[:, 2])
+    extinct = m_max <= 0.0
+    extinction = (m_min < 0.0) & (m_max > 0.0)
+    kinks = clip_kink_epsilons(group_size)
+    inside = (kinks[None, :] > lower[:, 2:3]) & (kinks[None, :] < upper[:, 2:3])
+    clip = np.any(inside, axis=1) & ~extinct
+    return {
+        "extinct": extinct,
+        "extinction": extinction,
+        "clip": clip,
+        "clean": ~extinction & ~clip,
+    }

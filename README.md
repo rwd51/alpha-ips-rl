@@ -21,7 +21,8 @@ src/                        shared core library, used by ALL experiments
   stationarity.py              the drift / balance / log forms of the stationarity equation
   finite_group.py              finite-G mean-field theory of the sampled update (K=2)
   finite_group_general.py      the same for any K (nested root-finding, extinction alphas)
-  hypergrid.py                 tensor grids, multilinear interpolation, batched K=2 solver
+  hypergrid.py                 tensor grids, multilinear interpolation, batched K=2 solver,
+                                 kink (m=0, eps=k/G) classification of grid cells
   estimators.py                weight rules (clip / add-lambda / Richardson / alpha-matched
                                  offset), their exact bias-variance statistics, and the
                                  sampled update with a pluggable rule
