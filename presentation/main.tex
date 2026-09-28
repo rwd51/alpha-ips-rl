@@ -55,7 +55,7 @@
 \subtitle{A tunable diversity correction for outcome-level mode collapse}
 \author{%
   Ahnaf Tahmid (2105041)\\
-  Sadia Binte Sayeed (2105045)\\
+  Sadia Binte Sayed (2105045)\\
   Mohammad Raihan Rashid (2105046)\\
   Ruwad Naswan (2105051)\\
   Md.\ Mehedi Hasan (2105052)}
@@ -1128,215 +1128,346 @@ solve. The margin $m$ is useful twice: as the criterion, and as a warning flag.
 \begin{frame}{Part 5: Objective}
 
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.44\textwidth}
+\begin{column}{0.46\textwidth}
 \footnotesize
-Parts 1 to 4 assume the update knows $p$. It does not. It has $G$ samples, and it
-needs $p^{-\alpha}$.
+\textbf{The problem.} IPS needs the weight $p^{-\alpha}$ for every answer, but
+training never knows $p$. It draws a group of $G$ samples, counts how often each
+answer appears ($n$), and uses the estimate
+\[
+  \omega(n)=\max\Big\{\frac{n}{G},\,\varepsilon\Big\}^{-\alpha}\;\approx\;p^{-\alpha}.
+\]
+The clip $\varepsilon$ stops a tiny count from giving a huge weight.
 
 \medskip
-This is the paper's own stated limitation, and it is a pure
-\alert{error-analysis} problem: bias against variance, with a knob ($\varepsilon$)
-that trades one for the other exactly like a step size trades truncation against
-round-off.
-
-\medskip
-We compare the paper's clipped rule against three alternatives, and ask which
-trade the \emph{learning dynamics} actually notice.
+The paper says this estimate ``can be noisy, requiring probability clipping that
+introduces a bias--variance trade-off'', but it never measures that trade-off.
+Part 5 does, in three steps.
 \end{column}
 
-\begin{column}{0.53\textwidth}
+\begin{column}{0.5\textwidth}
 \centering
-\vspace{-2mm}
-\begin{tikzpicture}[scale=0.94, transform shape]
-  \node[font=\scriptsize, text=mTeal, anchor=west] at (0,2.75)
-       {one group of $G=16$ draws:};
-  % the draws
-  \foreach \i/\c in {0/A,1/A,2/B,3/A,4/C,5/B,6/A,7/D,8/B,9/A,10/C,11/B,12/A,13/C,14/B,15/A}{
-    \node[draw=mTeal!45, fill=mTeal!7, minimum size=3.4mm, inner sep=0pt,
-          font=\tiny] at ({0.15+\i*0.38},2.2) {\c};
-  }
-  % counts row
-  \node[font=\scriptsize, text=mTeal, anchor=west] at (0,1.45) {counts $n_i$:};
-  \foreach \x/\t in {1.85/{$n_A{=}7$}, 3.15/{$n_B{=}5$}, 4.45/{$n_C{=}3$},
-                     5.55/{$n_D{=}1$}}
-    \node[font=\scriptsize] at (\x,1.45) {\t};
-  \node[font=\scriptsize, text=mRed] at (6.6,1.45) {$n_E{=}0$};
-  % weights row
-  \node[font=\scriptsize, text=mTeal, anchor=west] at (0,0.7)
-       {weight $\omega(n_i)$:};
-  \foreach \x/\t in {1.85/{2.3}, 3.15/{3.2}, 4.45/{5.3}, 5.55/{16}}
-    \node[font=\scriptsize] at (\x,0.7) {\t};
-  \node[ndr, inner sep=2pt] at (6.6,0.7) {\textbf{1000}};
-  \draw[arh] (6.6,1.22) -- (6.6,0.97);
-  \node[font=\scriptsize, text=mRed, align=right, anchor=north east] at (7.3,0.2)
-    {one outcome missed,\\ so $\omega=\varepsilon^{-1}$};
-\end{tikzpicture}
-
 \vspace{1mm}
-{\scriptsize\raggedright
-Without the clip that entry is $\infty$. With it, one unlucky group hands a rare
-outcome a weight 60 times larger than anything else in the same group.\par}
+\begin{tikzpicture}[
+  goal/.style={text width=6.1cm, align=left, inner sep=5pt, font=\footnotesize,
+               minimum height=11mm}]
+  \node[nd, goal] (g1) at (0,0)
+    {\hit{Goal 1: Measure the error.}\\
+     How wrong is $\omega(n)$, and what is the best clip $\varepsilon$?};
+  \node[nd, goal, below=4mm of g1] (g2)
+    {\hit{Goal 2: Try to do better.}\\
+     Three other ways to estimate the weight.};
+  \node[nd, goal, below=4mm of g2] (g3)
+    {\hit{Goal 3: What training feels.}\\
+     Which of these errors change where training ends up?};
+  \draw[ar] (g1) -- (g2);
+  \draw[ar] (g2) -- (g3);
+\end{tikzpicture}
 \end{column}
 \end{columns}
 \end{frame}
 
 % --------------------------------------------------------------- P5.2
-\begin{frame}{Part 5: Numerical Methods (1/2)}
+\begin{frame}{Part 5: Numerical Methods (1/3): Measure the Error}
 
-\footnotesize
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.49\textwidth}
+\footnotesize
+\textbf{1a. How big is the error?} \hfill \alert{Taylor expansion}
 
-\textbf{Truncation error via Taylor expansion.}
-Expand $f(x)=x^{-\alpha}$ about $p$ with the random step $\hat p-p$, take
-expectations, and use the binomial central moments
-($\mathbb{E}[\hat p]=p$, $\mathrm{Var}=pq/G$):
+\smallskip
+The weight is $f(\hat p)$ with $f(x)=x^{-\alpha}$ and $\hat p=n/G$. Expand around
+the true $p$, treating $\hat p-p$ as a random step:
 \[
-  \mathbb{E}[f(\hat p)]=f(p)+\tfrac12 f''(p)\tfrac{pq}{G}+O(G^{-2}),
+  f(\hat p)\approx f(p)+f'(p)(\hat p-p)+\tfrac12 f''(p)(\hat p-p)^2 .
 \]
-which gives the relative bias and standard deviation
+Average both sides. The middle term vanishes because $\mathbb{E}[\hat p]=p$, and
+$\mathbb{E}[(\hat p-p)^2]=\frac{p(1-p)}{G}$. This gives the relative bias and
+spread:
 \[
-  b=\frac{\alpha(\alpha+1)(1-p)}{2Gp},
-  \qquad
-  s=\alpha\sqrt{\frac{1-p}{Gp}} .
+  b\approx\frac{\alpha(\alpha+1)(1-p)}{2Gp},\qquad
+  s\approx\alpha\sqrt{\frac{1-p}{Gp}} .
 \]
-The small parameter is \alert{$Gp$}, the expected number of hits, not $G$.
-
+The bias comes from the curve of $x^{-\alpha}$ (the $f''$ term). Both shrink
+with \alert{$Gp$}, the expected number of times the answer is seen.
 \end{column}
-\begin{column}{0.47\textwidth}
 
-\textbf{Golden-section search.}
-$\mathrm{MSE}(\varepsilon)$ falls then rises, with kinks at every
-$\varepsilon=n/G$, so a derivative-free bracketing minimiser is the right tool.
-It shrinks the bracket by $1/\phi=0.618$ per evaluation.
+\begin{column}{0.47\textwidth}
+\footnotesize
+\textbf{1b. What is the best clip?} \hfill \alert{Golden-section search}
+
+\smallskip
+Total error: $\text{MSE}(\varepsilon)=b^2+s^2$.
+\begin{itemize}\setlength\itemsep{0pt}
+  \item Small $\varepsilon$: rare answers get huge weights (noise).
+  \item Large $\varepsilon$: many weights are capped too low (bias).
+\end{itemize}
+So the error falls, then rises. It has a kink at every $\varepsilon=n/G$, so it
+has no derivative there and Newton's method does not fit.
 
 \medskip
-\textbf{Richardson extrapolation.}
-Equation above is an expansion in $1/G$ with $G$-independent coefficients, so the
-standard combination applies. Splitting the group into halves of size $M=G/2$:
-\[
-  \omega_{\mathrm R}=2f\!\Big(\tfrac{n_A+n_B}{G}\Big)
-     -\tfrac12\Big[f\!\big(\tfrac{n_A}{M}\big)+f\!\big(\tfrac{n_B}{M}\big)\Big]
-\]
-raises the bias order from 1 to 2. Because $\hat p_A+\hat p_B=2\hat p$, the
-first-order noise term is unchanged, so the variance is free.
+Golden-section search only compares values. Keep two test points at ratio
+$0.618$, drop the side that cannot hold the minimum, repeat:
 
+\centering
+\begin{tikzpicture}[xscale=1.05, yscale=1.35]
+  \fill[mGreen!12] (1.728,0) rectangle (4.2,0.98);
+  \fill[mRed!10]   (0.2,0)   rectangle (1.728,0.98);
+  \draw[mTeal!60] (0.2,0) -- (4.2,0);
+  \draw[thick, mBlue] plot[smooth, domain=0.2:4.2, samples=40]
+        (\x,{0.12*(\x-2.6)^2+0.2});
+  \fill[mOrange] (1.728,0.291) circle (1.6pt);
+  \fill[mOrange] (2.672,0.2006) circle (1.6pt);
+  \foreach \x/\l in {0.2/$a$, 1.728/$x_1$, 2.672/$x_2$, 4.2/$b$}
+    \draw[mTeal] (\x,0.05) -- (\x,-0.05) node[below, font=\tiny] {\l};
+  \node[font=\tiny, text=mRed]           at (0.96,0.8) {drop};
+  \node[font=\tiny, text=mGreen!60!black] at (3.45,0.8) {keep};
+\end{tikzpicture}
 \end{column}
 \end{columns}
 \end{frame}
 
 % --------------------------------------------------------------- P5.3
-\begin{frame}{Part 5: Numerical Methods (2/2)}
+\begin{frame}{Part 5: Numerical Methods (2/3): Try Better Estimators}
 
-\footnotesize
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.49\textwidth}
+\begin{column}{0.52\textwidth}
+\footnotesize
+\textbf{Split-half Richardson.} \hfill \alert{Richardson extrapolation}
 
-\textbf{Eigenvalue decomposition: power method and QR.}
-A moving average over training steps turns the first-order relaxation of Part 2
-into a \alert{second-order} system. With $\kappa=\beta/h$,
+\smallskip
+From Goal 1, the average weight from a group of $G$ has the form
 \[
-  x''+\kappa x'+\kappa\,\alpha\lVert r\rVert_{1/\alpha}\,C\,x=0
-  \;\Longleftrightarrow\;
-  s^2+\kappa s+\kappa\lambda_j=0 .
+  E_G=f(p)+\frac{c_1}{G}+\frac{c_2}{G^2}+\cdots
 \]
-The $\lambda_j$ need the eigenvalues of $C$, which we compute with the
-\alert{power method} (with Hotelling deflation) and the \alert{QR algorithm},
-both written out and checked against a library.
-
-\medskip
-\textbf{ODE stability, again.} The quadratic rings when $\kappa<4\lambda$ and
-decays fastest at $\kappa=4\lambda$.
-
+with $c_1,c_2$ not depending on $G$. A group half the size gives
+$E_{G/2}=f(p)+\frac{2c_1}{G}+\frac{4c_2}{G^2}+\cdots$. Combine the two so the
+$1/G$ term cancels:
+\[
+  2E_G-E_{G/2}=f(p)-\frac{2c_2}{G^2}+\cdots
+\]
+No extra samples are needed. Split the group into halves $A$, $B$: each is a real
+group of $G/2$.
+\[
+  \omega_{\text{R}}=2f(\hat p)-\tfrac12\big[f(\hat p_A)+f(\hat p_B)\big]
+\]
+\textbf{Guard:} use $\omega_{\text{R}}$ only if both halves saw the answer and
+$\omega_{\text{R}}>0$. Otherwise use the plain clip.
 \end{column}
-\begin{column}{0.47\textwidth}
 
-\textbf{Round-off error.}
-The closed form derived for $\alpha=1$,
+\begin{column}{0.44\textwidth}
+\footnotesize
+\textbf{Laplace smoothing.} Pretend every answer was seen $\lambda$ extra times:
 \[
-  w_G(p)=\frac{1-(1-p)^G}{p},
+  \omega_\lambda(n)=\Big(\frac{n+\lambda}{G+K\lambda}\Big)^{-\alpha}.
 \]
-cancels catastrophically for small $p$. Evaluating it as
-$-\texttt{expm1}(G\,\texttt{log1p}(-p))/p$ keeps the digits:
+The estimate is never $0$, so there are no huge weights.
 
-\centering
-{\scriptsize
-\begin{tabular}{@{}lcc@{}}
-\toprule
-$p$ & direct & guarded \\
-\midrule
-$10^{-11}$ & $8.3\times10^{-8}$  & $2.1\times10^{-15}$ \\
-$10^{-13}$ & $3.1\times10^{-4}$  & $2.3\times10^{-15}$ \\
-\bottomrule
-\end{tabular}}
-
-\raggedright\smallskip
 \medskip
-Two more round-off lessons we hit for real:
-Gram-Schmidt QR silently breaks on the singular $C$, and the power method must
-stop on the residual $\lVert Ax-\lambda x\rVert$, not on $\lambda$, because the
-Rayleigh quotient is accurate to the \emph{square} of the vector error.
+\textbf{Moving average over steps.} Reuse past groups instead of one:
+\[
+  \bar p_t=(1-\beta)\,\bar p_{t-1}+\beta\,\hat p_t .
+\]
+Less noise, for free. But $\bar p$ lags behind a policy that is still changing.
+\alert{Golden-section search} picks the best $\beta$.
 
+\medskip
+For each rule we measure its bias and spread, as in Goal 1.
 \end{column}
 \end{columns}
 \end{frame}
 
 % --------------------------------------------------------------- P5.4
-\begin{frame}{Part 5: Results and Analysis}
+\begin{frame}{Part 5: Numerical Methods (3/3): What Training Feels}
 
-\footnotesize
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.48\textwidth}
-\textbf{An exact optimum for the clip.} Differentiating $\mathrm{MSE}(\varepsilon)$
-piecewise, the sign of the derivative is the sign of $p^{-\alpha}-\varepsilon^{-\alpha}$, so
-\[
-  \boxed{\;\varepsilon^\star=p\;}
-\]
-exactly, for every $\alpha$, $G$ and $p$. Golden-section search returns
-$\varepsilon^\star/p=1\pm7\times10^{-9}$, which is the $\sqrt{\epsilon_{\text{mach}}}$
-floor of any derivative-free minimiser.
+\begin{column}{0.47\textwidth}
+\footnotesize
+\textbf{Key idea: training only learns from answers it actually saw.}
 
 \medskip
-Since $\varepsilon$ is one global constant but $\varepsilon^\star$ is per-outcome,
-\alert{no single clip suits a majority and a minority outcome at once}. That is
-an honest explanation of why the paper's own $\varepsilon$ ablation has no clear
-winner.
+If an answer is missing from the group, its weight is multiplied by zero. It is
+never used, however wrong it is.
 
 \medskip
-\textbf{Richardson works, but must be guarded.} Bias order $1.03\to\hit{2.10}$,
-variance unchanged. Naive Richardson returns a \bad{negative} weight for a
-singleton ($-472$ at $G=16$), which is a sign-flipped reward.
+So the weight that matters is the one from a group that \alert{already contains
+the answer}: one sure hit, plus the rest of the group.
+
+\bigskip
+\centering
+\begin{tikzpicture}
+  \node[draw=mOrange, fill=mOrange, text=white, minimum size=5mm, inner sep=0pt,
+        font=\scriptsize\bfseries] at (0,0) {A};
+  \foreach \k in {1,...,7}
+    \node[draw=mTeal!45, fill=mTeal!7, minimum size=5mm, inner sep=0pt,
+          font=\scriptsize] at ({\k*0.6},0) {?};
+  \draw[decorate, decoration={brace, mirror, amplitude=3pt}, mTeal]
+    (0.35,-0.38) -- (4.45,-0.38)
+    node[midway, below=3pt, font=\scriptsize] {the rest of the group};
+  \node[font=\scriptsize, text=mOrange] at (0,-0.62) {sure hit};
+\end{tikzpicture}
 \end{column}
 
-\begin{column}{0.48\textwidth}
-\textbf{The result we did not expect.}
-The dynamics do not see $\mathbb{E}[\omega(n)]$. They see a size-biased version,
-$w_G(p)=\mathbb{E}[\omega(1+B)]$ with $B\sim\mathrm{Bin}(G-1,p)$. Expanding it,
-\[
-  w_G(p)p^{\alpha}-1=\frac{\alpha(\alpha-1)(1-p)}{2Gp}+O(G^{-2}),
-\]
-which \alert{vanishes at $\alpha=1$}, the paper's own exponent. In fact there it is
-exact: $w_G(p)=\frac{1-(1-p)^G}{p}$.
+\begin{column}{0.49\textwidth}
+\footnotesize
+\textbf{Taylor expansion again}, on this kind of group. It finds two small errors
+that pull in \alert{opposite directions}:
 
 \medskip
-So correcting the estimator's bias \emph{destroys} that cancellation. Training
-$\ell_1$ to the ideal $p^\star$, $K=5$:
-
 \centering
-{\scriptsize
-\begin{tabular}{@{}lcc@{}}
-\toprule
-$G$ & clip (paper) & guarded Richardson \\
-\midrule
-8  & 0.2439 & \good{0.2172} \\
-16 & 0.1092 & \good{0.0703} \\
-64 & \good{0.0016} & \bad{0.0294} \\
-\bottomrule
-\end{tabular}}
+\begin{tikzpicture}
+  \node[nd, font=\scriptsize] (w) at (0,0) {weight that\\ training uses};
+  \draw[-{Latex[length=2mm]}, very thick, mRed] (w.west) -- ++(-0.9,0)
+    node[left, font=\scriptsize, align=center, text=mRed] {too\\ small};
+  \draw[-{Latex[length=2mm]}, very thick, mGreen!60!black] (w.east) -- ++(0.9,0)
+    node[right, font=\scriptsize, align=center, text=mGreen!60!black] {too\\ big};
+\end{tikzpicture}
 
 \raggedright
+\begin{itemize}\setlength\itemsep{3pt}
+  \item \textbf{The sure hit} makes the answer look a little more common, so its
+        weight comes out a little \bad{too small}.
+  \item \textbf{The curve} of the weight formula (as in Goal 1) makes it come out
+        a little \good{too big}.
+\end{itemize}
+Add the two: that is the error training feels. If it is zero, training ends
+exactly at the ideal share.
+
 \medskip
-\alert{The better estimator trains worse} once $G$ is large.
+\textbf{Check:} train with each rule and measure how far training ends from the
+ideal share.
+\end{column}
+\end{columns}
+\end{frame}
+
+% --------------------------------------------------------------- P5.5
+\begin{frame}{Part 5: Results (1/2): Measuring and Improving the Estimate}
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.47\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=6.3cm, height=4.7cm,
+  xmode=log, ymode=log,
+  xmin=1e-3, xmax=1, ymin=0.003, ymax=2000,
+  xtick={1e-3,1e-2,1e-1,1}, ytick={0.01,1,100},
+  xlabel={clip $\varepsilon$}, ylabel={error of the weight},
+  label style={font=\scriptsize}, tick label style={font=\tiny},
+  axis line style={mTeal!60}, grid=major, grid style={mTeal!12},
+  legend style={font=\tiny, draw=none, fill=none, at={(0.98,0.98)}, anchor=north east},
+]
+  \addplot[mRed, thick] coordinates {(0.001,1057) (0.001347,574) (0.001815,310.2)
+    (0.002446,166.5) (0.003295,88.52) (0.00402,57.68) (0.004903,37.32)
+    (0.005981,23.93) (0.007296,15.17) (0.008901,9.476) (0.01086,5.812)
+    (0.01324,3.481) (0.01616,2.023) (0.01971,1.131) (0.02404,0.6044)
+    (0.02933,0.31) (0.03578,0.1609) (0.04364,0.1007) (0.0482,0.09197)
+    (0.05,0.09136) (0.05324,0.09299) (0.0588,0.1012) (0.06494,0.1195)
+    (0.07922,0.1868) (0.09664,0.2654) (0.1179,0.3454) (0.1438,0.4311)
+    (0.1754,0.5131) (0.214,0.5877) (0.261,0.6537) (0.3184,0.7106)
+    (0.3884,0.7591) (0.4738,0.8001) (0.578,0.8345) (0.7051,0.8632)
+    (0.8601,0.8871) (0.95,0.8975)};
+  \addlegendentry{rare answer, $p=0.05$}
+  \addplot[mBlue, thick] coordinates {(0.001,3.937) (0.001347,2.228)
+    (0.001815,1.287) (0.002446,0.7694) (0.003295,0.4846) (0.00402,0.3702)
+    (0.004903,0.2934) (0.005981,0.2419) (0.007296,0.2074) (0.008901,0.1843)
+    (0.01086,0.1688) (0.01324,0.1584) (0.01616,0.1515) (0.01971,0.1469)
+    (0.02404,0.1438) (0.02933,0.1418) (0.03578,0.1404) (0.04364,0.1395)
+    (0.05324,0.1389) (0.06494,0.1375) (0.07922,0.1332) (0.09664,0.1304)
+    (0.1179,0.1286) (0.1438,0.1222) (0.1754,0.1165) (0.214,0.1046)
+    (0.261,0.09006) (0.3184,0.06804) (0.3884,0.03905) (0.429,0.02653)
+    (0.4738,0.01797) (0.5,0.01674) (0.5233,0.01793) (0.578,0.02867)
+    (0.6384,0.05177) (0.7051,0.08611) (0.7788,0.1284) (0.8601,0.1753)
+    (0.95,0.2244)};
+  \addlegendentry{common answer, $p=0.5$}
+  \addplot[only marks, mark=*, mark size=2.2pt, mRed, forget plot]
+    coordinates {(0.05,0.09136)};
+  \addplot[only marks, mark=*, mark size=2.2pt, mBlue, forget plot]
+    coordinates {(0.5,0.01674)};
+  \node[font=\tiny, text=mRed, below left] at (axis cs:0.05,0.09136) {best: $\varepsilon=0.05$};
+  \node[font=\tiny, text=mBlue, below left] at (axis cs:0.5,0.01674) {best: $\varepsilon=0.5$};
+\end{axis}
+\end{tikzpicture}
+
+{\scriptsize\raggedright
+Error of the weight against the clip ($G=16$). Each answer is best at
+$\varepsilon=$ its own $p$. The two best points are far apart.\par}
+\end{column}
+
+\begin{column}{0.49\textwidth}
+\footnotesize
+\textbf{Goal 1: measuring the error}
+\begin{itemize}\setlength\itemsep{0pt}
+  \item Error shrinks the more often the answer is seen.
+  \item Best clip: \hit{exactly $\varepsilon=p$} (proved; golden section agrees).
+  \item One $\varepsilon$ for all answers: \alert{no single clip suits
+        common and rare answers}.
+\end{itemize}
+
+\smallskip
+\textbf{Goal 2: three other estimators}
+\begin{itemize}\setlength\itemsep{0pt}
+  \item \textbf{Richardson:} error shrinks much faster as $G$ grows.
+  \item \textbf{Moving average:} less noise for free, but it lags.
+  \item \textbf{Laplace:} less noise, but a weaker boost for rare answers.
+\end{itemize}
+
+\smallskip
+On paper, Richardson and the moving average are \alert{better estimators}.
+\end{column}
+\end{columns}
+\end{frame}
+
+% --------------------------------------------------------------- P5.6
+\begin{frame}{Part 5: Results (2/2): What Training Feels}
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.47\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  ybar, bar width=5pt,
+  width=6.3cm, height=4.7cm,
+  symbolic x coords={8,16,32,64}, xtick=data,
+  enlarge x limits=0.18,
+  ymin=0, ymax=0.47, ytick={0,0.1,0.2,0.3,0.4},
+  xlabel={group size $G$}, ylabel={distance from ideal share},
+  label style={font=\scriptsize}, tick label style={font=\tiny},
+  axis line style={mTeal!60}, ymajorgrids, grid style={mTeal!12},
+  legend style={font=\tiny, draw=none, fill=none, at={(0.98,0.98)}, anchor=north east},
+  area legend,
+]
+  \addplot[fill=mBlue, draw=none] coordinates {(8,0.2439) (16,0.1092) (32,0.0190) (64,0.0016)};
+  \addlegendentry{paper's clip}
+  \addplot[fill=mRed!70, draw=none] coordinates {(8,0.4294) (16,0.2199) (32,0.1106) (64,0.0419)};
+  \addlegendentry{Laplace ($\lambda=1$)}
+  \addplot[fill=mOrange, draw=none] coordinates {(8,0.2172) (16,0.0703) (32,0.0266) (64,0.0294)};
+  \addlegendentry{Richardson}
+\end{axis}
+\end{tikzpicture}
+
+{\scriptsize\raggedright
+Real training: 5 answers, 32 runs each. Lower means training ended closer to the
+ideal share. At $G=64$: clip \good{0.0016}, Richardson \bad{0.029}.\par}
+\end{column}
+
+\begin{column}{0.49\textwidth}
+\footnotesize
+\textbf{Goal 3: what training feels}
+\begin{itemize}\setlength\itemsep{3pt}
+  \item At the paper's own setting ($\alpha=1$), the two errors are \hit{exactly
+        the same size}, so they cancel. The paper's simple clip is almost perfect
+        for training.
+  \item Richardson removes one of the two errors, so the other one is left
+        alone. It wins with small groups but \bad{loses with large ones}.
+  \item Laplace is the worst at every group size.
+\end{itemize}
+
+\bigskip
+\begin{beamercolorbox}[wd=\linewidth, sep=6pt, rounded=true]{block body}
+\footnotesize
+\textbf{Main lesson.} A better estimate does not always mean better training.
+What matters is the error that \alert{training actually feels}.
+\end{beamercolorbox}
 \end{column}
 \end{columns}
 \end{frame}
