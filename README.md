@@ -8,6 +8,15 @@ for the write-up of each experiment's results. `main.ipynb` at the repo root
 runs any experiment and displays its figures (it is what we import as a Kaggle
 notebook; no GPU is needed anywhere).
 
+## Final report
+
+**[`A_04.pdf`](A_04.pdf) is our final project report**, submitted for CSE 402
+(Section A, Subsection A2, Group 04): *"Numerical Simulation of Learning
+Dynamics in Multimodal Reinforcement Learning: A Derived and Numerically
+Verified Stability Law for Diversity-Preserving Training."* It reviews the
+base paper, derives the α-IPS stability law (Box 1), and verifies every part
+of it numerically against all five experiments.
+
 ## Directory structure (convention — follow this for every new experiment)
 
 ```
