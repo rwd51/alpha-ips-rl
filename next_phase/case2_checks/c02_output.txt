@@ -1,0 +1,7 @@
+(a) RK4 real-axis limit x* = 2.7852935634;  max |R(-x)| on [0,x*] = 1.000000000000; min R(-x) = 0.2704
+(b) r=(4,1), alpha=2: p* = [0.6667 0.3333], lambda* = 8.0000
+    p2(0)=  5e-01: sup_path lambda_max(-J) =       10.0  ->  2/sup = 2.00e-01;  Euler h=0.05: l1 err 0e+00 (with p_floor=1e-12: l1 err after 4000 steps 0.00); Euler h=0.2: l1 err 0e+00 (with p_floor=1e-12: l1 err after 4000 steps 0.00)
+    p2(0)=  1e-01: sup_path lambda_max(-J) =       18.9  ->  2/sup = 1.06e-01;  Euler h=0.05: l1 err 0e+00 (with p_floor=1e-12: l1 err after 4000 steps 0.00); Euler h=0.2: overflow at step 4 (with p_floor=1e-12: l1 err after 4000 steps 1.33)
+    p2(0)=  1e-02: sup_path lambda_max(-J) =      198.1  ->  2/sup = 1.01e-02;  Euler h=0.05: overflow at step 3 (with p_floor=1e-12: l1 err after 4000 steps 0.67); Euler h=0.2: overflow at step 2 (with p_floor=1e-12: l1 err after 4000 steps 0.67)
+    p2(0)=  1e-03: sup_path lambda_max(-J) =     1998.0  ->  2/sup = 1.00e-03;  Euler h=0.05: overflow at step 2 (with p_floor=1e-12: l1 err after 4000 steps 0.67); Euler h=0.2: overflow at step 2 (with p_floor=1e-12: l1 err after 4000 steps 0.67)
+    p2(0)=  1e-04: sup_path lambda_max(-J) =    19998.0  ->  2/sup = 1.00e-04;  Euler h=0.05: overflow at step 1 (with p_floor=1e-12: l1 err after 4000 steps 0.67); Euler h=0.2: overflow at step 1 (with p_floor=1e-12: l1 err after 4000 steps 0.67)

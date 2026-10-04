@@ -1,0 +1,6 @@
+G=8, alpha=1, naive Richardson: w_G(0)=-486.0, w_G(1)=1.00, w_G<0 on p in [0.000, 0.778]
+   r=(1.5, 1.0): rest points of f in (0,1): [(0.5242, 'unstable')]; mean field from p1=0.5 -> p1=0.0000; MC (h=0.01, 32 seeds) long-run p1 = 0.5000
+   r=(4.0, 1.0): rest points of f in (0,1): [(0.5816, 'unstable')]; mean field from p1=0.5 -> p1=0.0000; MC (h=0.01, 32 seeds) long-run p1 = 0.4687
+G=16, alpha=1, naive Richardson: w_G(0)=-472.0, w_G(1)=1.00, w_G<0 on p in [0.000, 0.505]
+   r=(1.5, 1.0): rest points of f in (0,1): [(0.5008, 'unstable')]; mean field from p1=0.5 -> p1=0.0000; MC (h=0.01, 32 seeds) long-run p1 = 0.8125
+   r=(4.0, 1.0): rest points of f in (0,1): [(0.5027, 'unstable')]; mean field from p1=0.5 -> p1=0.0000; MC (h=0.01, 32 seeds) long-run p1 = 0.9687

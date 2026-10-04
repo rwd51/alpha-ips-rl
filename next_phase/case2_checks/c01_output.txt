@@ -1,0 +1,18 @@
+(a) max rel |rhs_alpha - grad_z F_alpha|      = 2.41e-09 (finite-difference level)
+(b) max rel asymmetry of jacobian_alpha(z)     = 1.84e-16 (J is a Hessian everywhere)
+(c) sign of dKL(p*||p)/dt at random states (20000 per cell):
+    K=2: a=0.3:    0 KL-increases | a=0.7:    0 KL-increases | a=1.0:    0 KL-increases | a=1.5:    0 KL-increases | a=3.0:    0 KL-increases
+    K=3: a=0.3:  316 KL-increases | a=0.7:   29 KL-increases | a=1.0:    0 KL-increases | a=1.5:    5 KL-increases | a=3.0:    0 KL-increases
+    K=5: a=0.3:  441 KL-increases | a=0.7:   28 KL-increases | a=1.0:    0 KL-increases | a=1.5:    5 KL-increases | a=3.0:    0 KL-increases
+(d) global convergence from near-boundary starts (LSODA, rtol 1e-10), r=(5,4,3,2,1):
+    alpha=0.2: T=30/lambda_min=  99295.3: max l1(p(T),p*) = 3.7e-14; F decreases: 0; KL increases: 486
+    alpha=0.5: T=30/lambda_min=    367.2: max l1(p(T),p*) = 2.6e-10; F decreases: 0; KL increases: 51
+    alpha=1.0: T=30/lambda_min=     26.1: max l1(p(T),p*) = 1.2e-12; F decreases: 0; KL increases: 0
+    alpha=2.0: T=30/lambda_min=      1.6: max l1(p(T),p*) = 1.7e-12; F decreases: 0; KL increases: 0
+    alpha=3.0: T=30/lambda_min=      0.2: max l1(p(T),p*) = 1.1e-12; F decreases: 0; KL increases: 0
+(e) max rel |finite-G mean drift - grad_z F_G| = 6.94e-09
+    finite-G mean field from near-boundary starts, r=(5,4,3,2,1), eps=1e-3:
+      G= 4, alpha=1.0: support 3/5, max l1(p(T), pi_KKT) = 2.6e-04, F_G decreases: 0
+      G=16, alpha=1.0: support 5/5, max l1(p(T), pi_KKT) = 4.2e-01, F_G decreases: 0
+      G= 8, alpha=0.5: support 3/5, max l1(p(T), pi_KKT) = 5.6e-04, F_G decreases: 0
+      G=16, alpha=2.0: support 5/5, max l1(p(T), pi_KKT) = 8.7e-16, F_G decreases: 0

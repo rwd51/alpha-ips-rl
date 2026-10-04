@@ -1,0 +1,8 @@
+(a) ideal IPS: max rel |E[update] - grad F_alpha(p(theta))| = 7.7e-10
+    finite G (exact 5^G enumeration): max rel |E[update] - grad F_G(p(theta))| = 2.3e-09
+(b) G=4, alpha=1.0: tree MC long-run outcome dist [6.399e-01 3.598e-01 4.000e-04] | bandit KKT target [0.6389 0.3611 0.    ] | ideal r^(1/alpha) [0.5    0.3333 0.1667]
+(b) G=8, alpha=1.0: tree MC long-run outcome dist [0.5428 0.3508 0.1064] | bandit KKT target [0.5412 0.35   0.1089] | ideal r^(1/alpha) [0.5    0.3333 0.1667]
+(b) G=4, alpha=2.0: tree MC long-run outcome dist [0.5365 0.3906 0.0729] | bandit KKT target [0.5136 0.3754 0.1109] | ideal r^(1/alpha) [0.4177 0.3411 0.2412]
+(c) G=4, alpha=2, h=0.05: tree MC [0.5342 0.3882 0.0776] | bandit KKT [0.5136 0.3754 0.1109] | l1 gap 0.0667
+(c) G=4, alpha=2, h=0.02: tree MC [0.5205 0.3799 0.0995] | bandit KKT [0.5136 0.3754 0.1109] | l1 gap 0.0228
+(c) G=4, alpha=2, h=0.01: tree MC [0.5163 0.3769 0.1068] | bandit KKT [0.5136 0.3754 0.1109] | l1 gap 0.0083

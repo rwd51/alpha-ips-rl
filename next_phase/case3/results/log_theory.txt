@@ -1,0 +1,62 @@
+=== python3 next_phase/case3/theory.py --workers 7 (20:38:06)
+mean-field ODE + stationary point for 48 configurations
+  all_A_click_plain_a0_G64_J0.1: RK4 steps 4000, doubling error 1.5e-07, 1s
+  all_A_click_plain_a0_G256_J0.1: RK4 steps 4000, doubling error 4.2e-08, 1s
+  all_A_click_plain_a0.5_G64_J0.1: RK4 steps 4000, doubling error 1.6e-06, 25s
+  all_A_click_plain_a1_G64_J0.1: RK4 steps 4000, doubling error 1.7e-06, 24s
+  all_A_click_plain_a0.25_G64_J0.1: RK4 steps 4000, doubling error 2.1e-06, 26s
+  all_A_click_plain_a0.75_G64_J0.1: RK4 steps 4000, doubling error 1.5e-06, 25s
+  all_A_click_grpo_a0_G64_J0.1: RK4 steps 4000, doubling error 1.5e-07, 1s
+  all_A_click_plain_a2_G64_J0.1: RK4 steps 4000, doubling error 1.5e-06, 24s
+  all_A_click_plain_a1.5_G64_J0.1: RK4 steps 4000, doubling error 1.5e-06, 26s
+  all_A_click_grpo_a0.5_G64_J0.1: RK4 steps 4000, doubling error 1.6e-06, 26s
+  all_A_click_plain_a3_G64_J0.1: RK4 steps 4000, doubling error 1.6e-06, 27s
+  all_B_click_plain_a0_G64_J0.1: RK4 steps 4000, doubling error 1.0e-07, 1s
+  all_A_click_grpo_a1_G64_J0.1: RK4 steps 4000, doubling error 1.7e-06, 24s
+  all_A_click_grpo_a2_G64_J0.1: RK4 steps 4000, doubling error 1.5e-06, 25s
+  all_B_click_plain_a0.5_G64_J0.1: RK4 steps 4000, doubling error 1.2e-06, 24s
+  men_A_click_plain_a0_G64_J0.1: RK4 steps 4000, doubling error 1.3e-07, 1s
+  all_B_click_plain_a1_G64_J0.1: RK4 steps 4000, doubling error 1.7e-06, 23s
+  men_A_click_plain_a0.5_G64_J0.1: RK4 steps 4000, doubling error 9.5e-07, 11s
+  women_A_click_plain_a0_G64_J0.1: RK4 steps 4000, doubling error 1.1e-07, 1s
+  all_A_click_plain_a0.5_G256_J0.1: RK4 steps 4000, doubling error 9.9e-07, 88s
+  men_A_click_plain_a1_G64_J0.1: RK4 steps 4000, doubling error 1.4e-11, 12s
+  men_A_click_plain_a2_G64_J0.1: RK4 steps 4000, doubling error 1.1e-14, 14s
+  all_A_click_plain_a0_G16_J0.1: RK4 steps 4000, doubling error 8.1e-07, 1s
+  all_A_click_plain_a2_G256_J0.1: RK4 steps 4000, doubling error 2.3e-13, 92s
+  all_A_click_plain_a1_G256_J0.1: RK4 steps 4000, doubling error 3.1e-07, 95s
+  all_B_click_plain_a2_G64_J0.1: RK4 steps 4000, doubling error 1.7e-06, 26s
+  all_A_click_plain_a0.25_G16_J0.1: RK4 steps 4000, doubling error 3.2e-06, 9s
+  all_A_click_plain_a0.5_G16_J0.1: RK4 steps 4000, doubling error 1.7e-05, 9s
+  women_A_click_plain_a0.5_G64_J0.1: RK4 steps 4000, doubling error 9.5e-07, 16s
+  women_A_click_plain_a1_G64_J0.1: RK4 steps 4000, doubling error 5.9e-07, 16s
+  women_A_click_plain_a2_G64_J0.1: RK4 steps 4000, doubling error 8.6e-09, 16s
+  all_A_click_grpo_a0_G16_J0.1: RK4 steps 4000, doubling error 8.1e-07, 1s
+  all_A_click_plain_a0.75_G16_J0.1: RK4 steps 4000, doubling error 4.0e-06, 13s
+  all_A_click_plain_a1_G16_J0.1: RK4 steps 4000, doubling error 4.7e-06, 10s
+  men_A_click_plain_a0_G16_J0.1: RK4 steps 4000, doubling error 5.8e-07, 1s
+  all_A_click_plain_a1.5_G16_J0.1: RK4 steps 4000, doubling error 4.7e-06, 11s
+  all_A_click_plain_a2_G16_J0.1: RK4 steps 4000, doubling error 4.3e-06, 11s
+  all_A_click_plain_a3_G16_J0.1: RK4 steps 4000, doubling error 4.5e-06, 11s
+  all_A_click_grpo_a1_G16_J0.1: RK4 steps 4000, doubling error 5.8e-06, 11s
+  all_A_click_grpo_a0.5_G16_J0.1: RK4 steps 4000, doubling error 2.9e-06, 11s
+  women_A_click_plain_a0_G16_J0.1: RK4 steps 4000, doubling error 5.0e-07, 1s
+  men_A_click_plain_a0.5_G16_J0.1: RK4 steps 4000, doubling error 3.1e-06, 7s
+  all_A_click_grpo_a2_G16_J0.1: RK4 steps 4000, doubling error 4.9e-06, 10s
+  men_A_click_plain_a1_G16_J0.1: RK4 steps 4000, doubling error 2.7e-06, 8s
+  men_A_click_plain_a2_G16_J0.1: RK4 steps 4000, doubling error 2.5e-06, 7s
+  women_A_click_plain_a1_G16_J0.1: RK4 steps 4000, doubling error 2.6e-06, 6s
+  women_A_click_plain_a0.5_G16_J0.1: RK4 steps 4000, doubling error 3.4e-06, 6s
+  women_A_click_plain_a2_G16_J0.1: RK4 steps 4000, doubling error 3.1e-06, 6s
+  S*(alpha) grids: 460 mean-field solves in 138s
+  check G=16 item 42: interp 0.13963 vs extinction_alpha 0.13954
+  check G=16 item 31: interp 0.52098 vs extinction_alpha 0.52094
+  check G=16 item 72: interp 2.44179 vs extinction_alpha 2.44174
+  check G=64 item 78: interp 0.16611 vs extinction_alpha 0.16588
+  check G=64 item 22: interp 0.41496 vs extinction_alpha 0.41479
+  check G=64 item 56: interp 3.71042 vs extinction_alpha 3.71031
+  check G=256 item 64: interp 0.26203 vs extinction_alpha 0.26169
+  check G=256 item 70: interp 0.94861 vs extinction_alpha 0.94859
+done in 409s
+    wall 409.66s, max RSS 180008kB
+EXIT=0

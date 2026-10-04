@@ -1,0 +1,252 @@
+{
+ "all_A": {
+  "uniform (the logging policy)": {
+   "ctr_train": 0.003429611840772556,
+   "ctr_train_se": 7.044915562868968e-05,
+   "ctr_test": 0.0035120629548433713,
+   "ctr_test_se": 7.148401032689965e-05,
+   "H": 1.0,
+   "kept": 80
+  },
+  "best item of the training half (perfect greedy)": {
+   "ctr_train": 0.007910863509749304,
+   "ctr_train_se": 0.0009351258535220186,
+   "ctr_test": 0.006937799043062201,
+   "ctr_test_se": 0.000907812054214718,
+   "H": -0.0,
+   "kept": 1
+  },
+  "best item of the held-out half (hindsight oracle, not achievable)": {
+   "ctr_train": 0.005880880880880881,
+   "ctr_train_se": 0.0008552885674740855,
+   "ctr_test": 0.009720388815552622,
+   "ctr_test_se": 0.0010747811633077741,
+   "H": -0.0,
+   "kept": 1
+  },
+  "uniform over the training half's top 5": {
+   "ctr_train": 0.00671297835143877,
+   "ctr_train_se": 0.0003951415221520293,
+   "ctr_test": 0.005373818693701938,
+   "ctr_test_se": 0.00035288574956479526,
+   "H": 0.367281636240871,
+   "kept": 5
+  },
+  "CTR-proportional p ~ c (ideal alpha = 1)": {
+   "ctr_train": 0.004242500018271685,
+   "ctr_train_se": 9.338757010890077e-05,
+   "ctr_test": 0.004148815018007748,
+   "ctr_test_se": 9.124739681431394e-05,
+   "H": 0.9727157457216914,
+   "kept": 80
+  },
+  "p ~ c^2 (ideal alpha = 0.5)": {
+   "ctr_train": 0.004884541310445267,
+   "ctr_train_se": 0.00012184257817816507,
+   "ctr_test": 0.004623394533824921,
+   "ctr_test_se": 0.00011656488179967342,
+   "H": 0.914635485391335,
+   "kept": 79
+  },
+  "p ~ sqrt(c) (ideal alpha = 2)": {
+   "ctr_train": 0.003852049477286301,
+   "ctr_train_se": 8.079386986753084e-05,
+   "ctr_test": 0.0038470390756731596,
+   "ctr_test_se": 8.019821831785081e-05,
+   "H": 0.992474132051775,
+   "kept": 80
+  },
+  "deployed Thompson sampling, week-average allocation": {
+   "ctr_train": 0.004810591651202656,
+   "ctr_train_se": 0.0001620501885262487,
+   "ctr_test": 0.005246206330494238,
+   "ctr_test_se": 0.00017549563611620194,
+   "H": 0.8069434839396064,
+   "kept": 77,
+   "on_policy_ctr_measured": 0.004953225649823585
+  }
+ },
+ "all_B": {
+  "uniform (the logging policy)": {
+   "ctr_train": 0.0035120629548433713,
+   "ctr_train_se": 7.148401032689965e-05,
+   "ctr_test": 0.003429611840772556,
+   "ctr_test_se": 7.044915562868968e-05,
+   "H": 1.0,
+   "kept": 80
+  },
+  "best item of the training half (perfect greedy)": {
+   "ctr_train": 0.009720388815552622,
+   "ctr_train_se": 0.0010747811633077741,
+   "ctr_test": 0.005880880880880881,
+   "ctr_test_se": 0.0008552885674740855,
+   "H": -0.0,
+   "kept": 1
+  },
+  "best item of the held-out half (hindsight oracle, not achievable)": {
+   "ctr_train": 0.006937799043062201,
+   "ctr_train_se": 0.000907812054214718,
+   "ctr_test": 0.007910863509749304,
+   "ctr_test_se": 0.0009351258535220186,
+   "H": -0.0,
+   "kept": 1
+  },
+  "uniform over the training half's top 5": {
+   "ctr_train": 0.008019932185185841,
+   "ctr_train_se": 0.00043459032854132663,
+   "ctr_test": 0.005619300878811321,
+   "ctr_test_se": 0.00036197083372634396,
+   "H": 0.367281636240871,
+   "kept": 5
+  },
+  "CTR-proportional p ~ c (ideal alpha = 1)": {
+   "ctr_train": 0.004478101561007912,
+   "ctr_train_se": 0.00010069842359694298,
+   "ctr_test": 0.004051415163646731,
+   "ctr_test_se": 9.19557649278335e-05,
+   "H": 0.9708195871018469,
+   "kept": 80
+  },
+  "p ~ c^2 (ideal alpha = 0.5)": {
+   "ctr_train": 0.00544888760973238,
+   "ctr_train_se": 0.0001502305676109724,
+   "ctr_test": 0.004563235984406427,
+   "ctr_test_se": 0.00012884713099744978,
+   "H": 0.895805971071761,
+   "kept": 79
+  },
+  "p ~ sqrt(c) (ideal alpha = 2)": {
+   "ctr_train": 0.003984560663745605,
+   "ctr_train_se": 8.345378216679662e-05,
+   "ctr_test": 0.0037477735334572786,
+   "ctr_test_se": 7.915251655101463e-05,
+   "H": 0.9924877047142117,
+   "kept": 80
+  },
+  "deployed Thompson sampling, week-average allocation": {
+   "ctr_train": 0.005246206330494238,
+   "ctr_train_se": 0.00017549563611620194,
+   "ctr_test": 0.004810591651202656,
+   "ctr_test_se": 0.0001620501885262487,
+   "H": 0.8069434839396064,
+   "kept": 77,
+   "on_policy_ctr_measured": 0.004953225649823585
+  }
+ },
+ "men_A": {
+  "uniform (the logging policy)": {
+   "ctr_train": 0.005084674968615392,
+   "ctr_train_se": 0.00014986758020088344,
+   "ctr_test": 0.005182341034019859,
+   "ctr_test_se": 0.000150891292452523,
+   "H": 1.0000000000000002,
+   "kept": 34
+  },
+  "best item of the training half (perfect greedy)": {
+   "ctr_train": 0.009773578758755497,
+   "ctr_train_se": 0.0012555824792797547,
+   "ctr_test": 0.0055389221556886225,
+   "ctr_test_se": 0.0009080678389613657,
+   "H": -0.0,
+   "kept": 1
+  },
+  "best item of the held-out half (hindsight oracle, not achievable)": {
+   "ctr_train": 0.004726037512922759,
+   "ctr_train_se": 0.0008334767635257453,
+   "ctr_test": 0.010277492291880781,
+   "ctr_test_se": 0.0012220665676017193,
+   "H": -0.0,
+   "kept": 1
+  },
+  "uniform over the training half's top 5": {
+   "ctr_train": 0.008066246454230448,
+   "ctr_train_se": 0.0005003040109397057,
+   "ctr_test": 0.005764819295505113,
+   "ctr_test_se": 0.0004143127244266358,
+   "H": 0.45640197625830825,
+   "kept": 5
+  },
+  "CTR-proportional p ~ c (ideal alpha = 1)": {
+   "ctr_train": 0.005648931461483408,
+   "ctr_train_se": 0.00017598805512935152,
+   "ctr_test": 0.005334046923185284,
+   "ctr_test_se": 0.00016316240188469095,
+   "H": 0.9849387592489501,
+   "kept": 34
+  },
+  "p ~ c^2 (ideal alpha = 0.5)": {
+   "ctr_train": 0.006234137652451757,
+   "ctr_train_se": 0.00022116182762160248,
+   "ctr_test": 0.005469338082100794,
+   "ctr_test_se": 0.00019098509216335696,
+   "H": 0.9412542282065627,
+   "kept": 34
+  },
+  "p ~ sqrt(c) (ideal alpha = 2)": {
+   "ctr_train": 0.0053613515572035345,
+   "ctr_train_se": 0.00016051906859825628,
+   "ctr_test": 0.0052593661851812485,
+   "ctr_test_se": 0.000155011950313532,
+   "H": 0.9962447512712326,
+   "kept": 34
+  }
+ },
+ "women_A": {
+  "uniform (the logging policy)": {
+   "ctr_train": 0.004772977424242314,
+   "ctr_train_se": 0.00010482879510972508,
+   "ctr_test": 0.004864013553871771,
+   "ctr_test_se": 0.00010588697262407986,
+   "H": 0.9999999999999998,
+   "kept": 46
+  },
+  "best item of the training half (perfect greedy)": {
+   "ctr_train": 0.010119979134063642,
+   "ctr_train_se": 0.001022315697385851,
+   "ctr_test": 0.005361050328227571,
+   "ctr_test_se": 0.0007638086551379555,
+   "H": -0.0,
+   "kept": 1
+  },
+  "best item of the held-out half (hindsight oracle, not achievable)": {
+   "ctr_train": 0.006032384379299397,
+   "ctr_train_se": 0.0007965952204095634,
+   "ctr_test": 0.008666450005416531,
+   "ctr_test_se": 0.0009647308015270532,
+   "H": -0.0,
+   "kept": 1
+  },
+  "uniform over the training half's top 5": {
+   "ctr_train": 0.00809625689658023,
+   "ctr_train_se": 0.0004114853236604678,
+   "ctr_test": 0.006022405665101552,
+   "ctr_test_se": 0.000352702111632889,
+   "H": 0.4203678918349397,
+   "kept": 5
+  },
+  "CTR-proportional p ~ c (ideal alpha = 1)": {
+   "ctr_train": 0.0054084389433803285,
+   "ctr_train_se": 0.00012524361461229387,
+   "ctr_test": 0.0052486189091523455,
+   "ctr_test_se": 0.00011995484252859474,
+   "H": 0.9830227098514397,
+   "kept": 46
+  },
+  "p ~ c^2 (ideal alpha = 0.5)": {
+   "ctr_train": 0.006032356442494845,
+   "ctr_train_se": 0.00015939216542160895,
+   "ctr_test": 0.005517604369274951,
+   "ctr_test_se": 0.00014307036144723344,
+   "H": 0.9374398112374298,
+   "kept": 46
+  },
+  "p ~ sqrt(c) (ideal alpha = 2)": {
+   "ctr_train": 0.005090278253945755,
+   "ctr_train_se": 0.00011337814732088837,
+   "ctr_test": 0.005069672999506302,
+   "ctr_test_se": 0.00011178794529837161,
+   "H": 0.9956164280979861,
+   "kept": 46
+  }
+ }
+}

@@ -1,0 +1,17 @@
+=== python3 next_phase/case3/run_replay.py --suite robustness --workers 6 (07:06:16)
+suite robustness: 12 configurations, 12 to run, 6 workers
+  [   477s] all_A_click_plain_a0_G64_J0.05: 476s, frac(max p > 0.95) = 1.00
+  [   562s] all_A_click_plain_a0_G64_J0.025: 561s, frac(max p > 0.95) = 1.00
+  [   690s] all_A_click_plain_a0_G64_J0.2: 212s, frac(max p > 0.95) = 1.00
+  [   753s] all_A_click_plain_a0_G64_J0.4: 190s, frac(max p > 0.95) = 1.00
+  [   870s] all_B_click_plain_a0_G64_J0.1: 180s, frac(max p > 0.95) = 1.00
+  [   979s] all_A_click_plain_a0.25_G16_J0.05: 978s, frac(max p > 0.95) = 0.00
+  [  1007s] all_A_click_plain_a0_G16_J0.025: 254s, frac(max p > 0.95) = 1.00
+  [  1063s] all_A_click_plain_a0_G16_J0.05: 193s, frac(max p > 0.95) = 1.00
+  [  1068s] all_A_click_plain_a0_G16_J0.2: 89s, frac(max p > 0.95) = 1.00
+  [  1113s] all_B_click_plain_a1_G64_J0.1: 1112s, frac(max p > 0.95) = 0.00
+  [  1116s] all_B_click_plain_a0.5_G64_J0.1: 1115s, frac(max p > 0.95) = 0.00
+  [  1152s] all_B_click_plain_a2_G64_J0.1: 1151s, frac(max p > 0.95) = 0.00
+suite robustness done in 1152s
+    wall 1153.36s, max RSS 154248kB
+EXIT=0

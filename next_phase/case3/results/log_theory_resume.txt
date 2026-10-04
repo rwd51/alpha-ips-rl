@@ -1,0 +1,6 @@
+=== theory --part mf
+mean-field ODE + stationary point for 1 configurations
+  all_A_click_plain_a0.25_G16_J0.05: RK4 steps 4000, doubling error 3.2e-06, 12s
+done in 12s
+    wall 12.48s
+EXIT=0

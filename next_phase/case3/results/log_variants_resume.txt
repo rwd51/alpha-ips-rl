@@ -1,0 +1,10 @@
+=== python3 next_phase/case3/run_replay.py --suite variants --workers 6 (06:49:43)
+suite variants: 16 configurations, 5 to run, 6 workers
+  [   123s] all_A_click_grpo_a0_G16_J0.1: 122s, frac(max p > 0.95) = 1.00
+  [   258s] all_A_click_grpo_a0_G64_J0.1: 258s, frac(max p > 0.95) = 1.00
+  [   859s] all_A_ctr_plain_a2_G16_J0.1: 858s, frac(max p > 0.95) = 0.00
+  [   884s] all_A_click_grpo_a1_G16_J0.1: 884s, frac(max p > 0.95) = 0.00
+  [   993s] all_A_click_grpo_a2_G16_J0.1: 992s, frac(max p > 0.95) = 0.00
+suite variants done in 993s
+    wall 993.79s, max RSS 109956kB
+EXIT=0

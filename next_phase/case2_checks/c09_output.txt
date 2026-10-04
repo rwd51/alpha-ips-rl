@@ -1,0 +1,38 @@
+1  (u+sinh u) from 0.1 to ln 99 = 53.8899  (report: 53.89)
+2  lambda(r=(4,1), alpha=1) = 1.600000  (report: 1.6)
+   tie K=3, alpha=0.5: rates [0.490748 0.490748] vs alpha*rbar*K^(alpha-1) = 0.490748
+   tie K=5, alpha=2.0: rates [17. 17. 17. 17.] vs alpha*rbar*K^(alpha-1) = 17.000000
+3  eps* = p by brute force (grid ratio 1.0046): max |eps*/p - 1| = 2.08e-03
+   add-lambda lambda* = Kp(1-p)/(1-Kp)^2 by brute force: max rel diff 6.6e-06
+4  size-biasing: max rel |phi_G/p - E[omega(1+B)]| = 1.9e-15
+   alpha=1 closed form vs binomial sum (G=12): 2.0e-13
+   ... with eps = 0.2 > 1/G the identity fails by up to 0.58 (needs eps <= 1/G)
+5  alpha=0.5: G p D/(1-p): clip -0.1250 (theory -0.1250); offset c*: +0.00002 (theory 0)
+5  alpha=2.0: G p D/(1-p): clip +1.0014 (theory +1.0000); offset c*: -0.00027 (theory 0)
+5  alpha=3.0: G p D/(1-p): clip +3.0073 (theory +3.0000); offset c*: -0.00106 (theory 0)
+6  G= 8 alpha=0.5: naive w_G monotone=False (max rise 6.06e-02), interior roots rho=1.5/4: [0, 0]; guarded monotone=True
+6  G= 8 alpha=1.0: naive w_G monotone=False (max rise 2.42e+00), interior roots rho=1.5/4: [1, 1]; guarded monotone=True
+6  G= 8 alpha=2.0: naive w_G monotone=False (max rise 2.49e+03), interior roots rho=1.5/4: [1, 1]; guarded monotone=True
+6  G=16 alpha=0.5: naive w_G monotone=False (max rise 1.03e-01), interior roots rho=1.5/4: [0, 0]; guarded monotone=True
+6  G=16 alpha=1.0: naive w_G monotone=False (max rise 4.66e+00), interior roots rho=1.5/4: [1, 1]; guarded monotone=True
+6  G=16 alpha=2.0: naive w_G monotone=False (max rise 4.97e+03), interior roots rho=1.5/4: [1, 1]; guarded monotone=True
+6  G=64 alpha=0.5: naive w_G monotone=False (max rise 1.81e-01), interior roots rho=1.5/4: [2, 0]; guarded monotone=True
+6  G=64 alpha=1.0: naive w_G monotone=False (max rise 1.44e+01), interior roots rho=1.5/4: [2, 0]; guarded monotone=True
+6  G=64 alpha=2.0: naive w_G monotone=False (max rise 1.91e+04), interior roots rho=1.5/4: [2, 0]; guarded monotone=True
+7  alpha_c(O5, G=16) = 0.8862 (report 0.886); pairwise ln5/ln16 = 0.5805
+   minimum G keeping O4 at some alpha: 3
+   minimum G keeping O5 at some alpha: 6
+   alpha=4, r=(4,1): p2 by G G=8: 0.4334, G=10: 0.4419, G=12: 0.4447, G=14: 0.4440, G=16: 0.4413  (G->inf: 0.4142)
+8  kink at eps=1/16: slope jump -0.03938 vs Delta_k -0.03938
+8  kink at eps=2/16: slope jump -0.14546 vs Delta_k -0.14546
+8  kink at eps=3/16: slope jump -0.33434 vs Delta_k -0.33434
+9  alpha=1: max |m_baseline(G) - m_vanilla(G-1)| over 2000 random (K,r,p,G) = 2.7e-15
+   => K=5, r=(5,4,3,2,1): baseline at G=16 has the vanilla G=15 target [0.3623 0.2884 0.2114 0.1257 0.0122]
+10 clip, G=16, p=0.1, alpha=1: relative RMSE of omega(n) incl. n=0 = 42.6 (report 42.6); share of MSE from n=0: 1.000
+   conditional on n>=1: 0.479;  size-biased (what the mean field sees): 0.468;  update term p^ omega(n): mean 0.8147, sd 0.3885
+11 paper Table 4: clip can fire (eps > 1/G)?  entries
+   G= 4: fires [False, False, False]  entries (17.63, 17.63, 17.63)
+   G= 8: fires [False, False, True]  entries (27.5, 27.5, 41.99)
+   G=16: fires [False, True, True]  entries (41.02, 33.05, 43.91)
+   G=32: fires [False, True, True]  entries (32.13, 35.27, 25.62)
+   G=64: fires [False, True, True]  entries (36.52, 39.12, 42.19)

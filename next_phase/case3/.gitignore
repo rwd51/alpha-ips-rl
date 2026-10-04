@@ -1,0 +1,7 @@
+data/
+.venv/
+__pycache__/
+*.pyc
+# raw per-configuration training runs (regenerate with run_replay.py)
+results/runs/
+results/theory_runs/

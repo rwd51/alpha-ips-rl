@@ -1,0 +1,6 @@
+fast solver vs repository solver (30 random cases): max |dp| = 2.1e-10, max |d ln S| = 1.4e-09
+600 (r, G, eps) cases x 60 alphas in [0.02, 40], 2770 outcome curves:
+  cases where s*(alpha) = S*/m_G^alpha increased:      0
+  curves h_j(alpha) that decreased anywhere:          0
+  curves with more than one sign change:              0
+  alpha->inf criterion vs sign of h_j(40) (eps<1/G):   2216/2216 agree

@@ -1,0 +1,193 @@
+{
+ "all": {
+  "campaign": "all",
+  "rows": 1374327,
+  "K": 80,
+  "clicks": 4768,
+  "ctr_overall": 0.0034693344451502445,
+  "impressions_per_item_min_max": [
+   16325,
+   18184
+  ],
+  "clicks_per_item_min_mean_max": [
+   20,
+   59.6,
+   129
+  ],
+  "best_item": 60,
+  "best_ctr": 0.00784073506891271,
+  "best_ctr_ci": [
+   0.006598733549319818,
+   0.009314311990910054
+  ],
+  "min_ctr": 0.0011475786091347257,
+  "ratio_best_to_worst": 6.832416539050536,
+  "ratio_best_to_median": 2.360734711989777,
+  "items_within_10pct": 3,
+  "items_within_20pct": 5,
+  "items_within_30pct": 9,
+  "items_within_50pct": 29,
+  "items_not_sig_worse_than_best_5pct_one_sided": 4,
+  "posterior_P_best_of_top_item": 0.55645,
+  "posterior_items_needed_for_90pct_P_best": 3,
+  "split_half_pearson": 0.7100665507238112,
+  "split_half_spearman": 0.7730661040787623,
+  "best_first_half": 35,
+  "best_second_half": 60,
+  "rank_in_second_half_of_first_half_best": 4,
+  "P_best_of_first_half_top_item_given_first_half": 0.56665,
+  "ctr_by_position": {
+   "1": 0.003541446054082379,
+   "2": 0.0034704185019141867,
+   "3": 0.0033961638190691543
+  },
+  "ctr_by_day": [
+   0.0033878781719009383,
+   0.0032197281524980336,
+   0.0038150482458586647,
+   0.0030275867987679867,
+   0.003668216718935871,
+   0.0034606050316098556,
+   0.003710534644388908
+  ]
+ },
+ "men": {
+  "campaign": "men",
+  "rows": 452949,
+  "K": 34,
+  "clicks": 2321,
+  "ctr_overall": 0.005124197205424894,
+  "impressions_per_item_min_max": [
+   12514,
+   14014
+  ],
+  "clicks_per_item_min_mean_max": [
+   42,
+   68.26470588235294,
+   102
+  ],
+  "best_item": 13,
+  "best_ctr": 0.0076528599605522685,
+  "best_ctr_ci": [
+   0.006277809465870404,
+   0.009326265909596072
+  ],
+  "min_ctr": 0.0031619363095686213,
+  "ratio_best_to_worst": 2.420308068000376,
+  "ratio_best_to_median": 1.5401142115126385,
+  "items_within_10pct": 5,
+  "items_within_20pct": 9,
+  "items_within_30pct": 12,
+  "items_within_50pct": 27,
+  "items_not_sig_worse_than_best_5pct_one_sided": 10,
+  "posterior_P_best_of_top_item": 0.28165,
+  "posterior_items_needed_for_90pct_P_best": 5,
+  "split_half_pearson": 0.27464137629770424,
+  "split_half_spearman": 0.3900687547746371,
+  "best_first_half": 31,
+  "best_second_half": 3,
+  "rank_in_second_half_of_first_half_best": 13,
+  "P_best_of_first_half_top_item_given_first_half": 0.6581,
+  "ctr_by_position": {
+   "1": 0.005379763608416813,
+   "2": 0.005244755244755245,
+   "3": 0.0047481871461209895
+  },
+  "ctr_by_day": [
+   0.005762131988835869,
+   0.004827284652383034,
+   0.004853465915816887,
+   0.0040194626613073835,
+   0.005302195784680914,
+   0.004202226044066586,
+   0.006730692912135884
+  ]
+ },
+ "women": {
+  "campaign": "women",
+  "rows": 864585,
+  "K": 46,
+  "clicks": 4163,
+  "ctr_overall": 0.004815026862598819,
+  "impressions_per_item_min_max": [
+   18087,
+   19511
+  ],
+  "clicks_per_item_min_mean_max": [
+   35,
+   90.5,
+   148
+  ],
+  "best_item": 36,
+  "best_ctr": 0.007797062750333778,
+  "best_ctr_ci": [
+   0.0066342847766635935,
+   0.009161758903902322
+  ],
+  "min_ctr": 0.0018162947586922678,
+  "ratio_best_to_worst": 4.29283997711234,
+  "ratio_best_to_median": 1.6191967123529252,
+  "items_within_10pct": 5,
+  "items_within_20pct": 11,
+  "items_within_30pct": 15,
+  "items_within_50pct": 31,
+  "items_not_sig_worse_than_best_5pct_one_sided": 11,
+  "posterior_P_best_of_top_item": 0.33575,
+  "posterior_items_needed_for_90pct_P_best": 6,
+  "split_half_pearson": 0.5433100457305665,
+  "split_half_spearman": 0.5884057971014492,
+  "best_first_half": 36,
+  "best_second_half": 26,
+  "rank_in_second_half_of_first_half_best": 20,
+  "P_best_of_first_half_top_item_given_first_half": 0.87805,
+  "ctr_by_position": {
+   "1": 0.0048310352367103146,
+   "2": 0.004752983624757147,
+   "3": 0.0048610725587076
+  },
+  "ctr_by_day": [
+   0.00467880719659032,
+   0.00523656319140508,
+   0.004933390325568141,
+   0.004302609514283192,
+   0.004687021199543138,
+   0.004555327366615113,
+   0.005520311240405173
+  ]
+ },
+ "bts_all": {
+  "rows": 12357200,
+  "hours": 168,
+  "items": 80,
+  "on_policy_ctr": 0.004953225649823585,
+  "on_policy_ctr_ci95": [
+   0.004914235556462904,
+   0.004992523542863339
+  ],
+  "share_norm_entropy": 0.8069434839396064,
+  "share_effective_items_expH": 34.3309692124151,
+  "share_max": 0.10934321690997961,
+  "share_argmax_item": 51,
+  "items_with_share_gt_1e-3": 77,
+  "hourly_norm_entropy_min_median_max": [
+   0.49724502527156267,
+   0.7282537570986112,
+   0.8707665819506364
+  ],
+  "hourly_max_share_min_median_max": [
+   0.08925490706682725,
+   0.16845362745934694,
+   0.3219097316345893
+  ],
+  "distinct_hourly_top_items": 14,
+  "replay_ctr_of_time_avg_share_on_random_log_full": [
+   0.005030330072506917,
+   0.00011950679288531097
+  ],
+  "replay_ctr_of_time_avg_share_on_random_log_second_half": [
+   0.005246206330494238,
+   0.00017549563611620194
+  ],
+  "rank_by_random_ctr_of_bts_top_item": 18
+ }
+}

@@ -1,0 +1,46 @@
+suite main: 20 configurations, 20 to run, 7 workers
+  [   463s] all_A_click_plain_a1_G64_J0.1: 463s, frac(max p > 0.95) = 0.00
+  [   465s] all_A_click_plain_a0.25_G64_J0.1: 465s, frac(max p > 0.95) = 0.00
+  [   469s] all_A_click_plain_a0.5_G64_J0.1: 469s, frac(max p > 0.95) = 0.00
+  [   471s] all_A_click_plain_a0.75_G64_J0.1: 470s, frac(max p > 0.95) = 0.00
+  [   506s] all_A_click_plain_a1_G256_J0.1: 506s, frac(max p > 0.95) = 0.00
+  [   509s] all_A_click_plain_a0.5_G256_J0.1: 508s, frac(max p > 0.95) = 0.00
+  [   516s] all_A_click_plain_a2_G256_J0.1: 516s, frac(max p > 0.95) = 0.00
+  [   732s] all_A_click_plain_a0_G256_J0.1: 262s, frac(max p > 0.95) = 1.00
+  [   787s] all_A_click_plain_a0.25_G16_J0.1: 281s, frac(max p > 0.95) = 0.00
+  [   801s] all_A_click_plain_a0.5_G16_J0.1: 292s, frac(max p > 0.95) = 0.00
+  [   803s] all_A_click_plain_a0.75_G16_J0.1: 287s, frac(max p > 0.95) = 0.00
+  [   963s] all_A_click_plain_a1.5_G64_J0.1: 500s, frac(max p > 0.95) = 0.00
+  [   968s] all_A_click_plain_a2_G64_J0.1: 503s, frac(max p > 0.95) = 0.00
+  [   974s] all_A_click_plain_a3_G64_J0.1: 505s, frac(max p > 0.95) = 0.00
+  [   988s] all_A_click_plain_a1_G16_J0.1: 255s, frac(max p > 0.95) = 0.00
+  [  1012s] all_A_click_plain_a0_G16_J0.1: 44s, frac(max p > 0.95) = 1.00
+  [  1033s] all_A_click_plain_a0_G64_J0.1: 69s, frac(max p > 0.95) = 1.00
+  [  1038s] all_A_click_plain_a1.5_G16_J0.1: 251s, frac(max p > 0.95) = 0.00
+  [  1043s] all_A_click_plain_a3_G16_J0.1: 239s, frac(max p > 0.95) = 0.00
+  [  1043s] all_A_click_plain_a2_G16_J0.1: 242s, frac(max p > 0.95) = 0.00
+suite main done in 1043s
+	Command being timed: "python3 next_phase/case3/run_replay.py --suite main --workers 7"
+	User time (seconds): 6696.37
+	System time (seconds): 6.52
+	Percent of CPU this job got: 642%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 17:23.10
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 111996
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 130592
+	Voluntary context switches: 354
+	Involuntary context switches: 1377211
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 18560
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+EXIT=0

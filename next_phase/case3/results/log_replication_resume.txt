@@ -1,0 +1,21 @@
+=== python3 next_phase/case3/run_replay.py --suite replication --workers 6 (07:25:30)
+suite replication: 16 configurations, 16 to run, 6 workers
+  [   779s] women_A_click_plain_a0.5_G64_J0.1: 778s, frac(max p > 0.95) = 0.00
+  [   812s] women_A_click_plain_a1_G64_J0.1: 812s, frac(max p > 0.95) = 0.00
+  [   826s] men_A_click_plain_a2_G64_J0.1: 826s, frac(max p > 0.95) = 0.00
+  [   901s] men_A_click_plain_a0.5_G64_J0.1: 901s, frac(max p > 0.95) = 0.00
+  [   917s] women_A_click_plain_a2_G64_J0.1: 917s, frac(max p > 0.95) = 0.00
+  [   942s] men_A_click_plain_a1_G64_J0.1: 942s, frac(max p > 0.95) = 0.00
+  [  1217s] men_A_click_plain_a1_G16_J0.1: 405s, frac(max p > 0.95) = 0.00
+  [  1291s] men_A_click_plain_a2_G16_J0.1: 465s, frac(max p > 0.95) = 0.00
+  [  1332s] men_A_click_plain_a0.5_G16_J0.1: 553s, frac(max p > 0.95) = 0.00
+  [  1335s] men_A_click_plain_a0_G64_J0.1: 117s, frac(max p > 0.95) = 1.00
+  [  1338s] women_A_click_plain_a1_G16_J0.1: 421s, frac(max p > 0.95) = 0.00
+  [  1397s] women_A_click_plain_a0_G16_J0.1: 62s, frac(max p > 0.95) = 1.00
+  [  1412s] men_A_click_plain_a0_G16_J0.1: 80s, frac(max p > 0.95) = 1.00
+  [  1413s] women_A_click_plain_a0_G64_J0.1: 121s, frac(max p > 0.95) = 1.00
+  [  1428s] women_A_click_plain_a0.5_G16_J0.1: 526s, frac(max p > 0.95) = 0.00
+  [  1443s] women_A_click_plain_a2_G16_J0.1: 501s, frac(max p > 0.95) = 0.00
+suite replication done in 1443s
+    wall 1444.22s, max RSS 105124kB
+EXIT=0

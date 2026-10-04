@@ -1,0 +1,9 @@
+(a) K=2, r=(4,1), alpha=1, G=16: mean-field p2* = 0.1950; target p2*/2; c = 24.0
+    p2(0)=1e-02: finite-G mean field t =          5.4  (1/(c p2(0)) =          4.2);  ideal IPS t =   1.54
+    p2(0)=1e-04: finite-G mean field t =        420.3  (1/(c p2(0)) =        416.7);  ideal IPS t =   3.87
+    p2(0)=1e-06: finite-G mean field t =      41672.6  (1/(c p2(0)) =      41666.7);  ideal IPS t =   6.18
+    p2(0)=1e-08: finite-G mean field t =    4166674.9  (1/(c p2(0)) =    4166666.7);  ideal IPS t =   8.48
+(b) Monte Carlo agent (rhs_sampled), h=0.05, 64 seeds: time to reach p2 >= p2*/2
+    p2(0)=1e-03: median t =     43.7, recovered 100% (mean-field prediction 44.1)
+    p2(0)=1e-04: median t =    410.8, recovered 100% (mean-field prediction 420.3)
+(c) K=5, G=16, alpha=1: O5 from 1e-6 to p5*/2 = 0.0093: finite-G mean field t = 348086 (invasion rate r5 w_G(0) - S* = 2.06); ideal IPS t = 8.92

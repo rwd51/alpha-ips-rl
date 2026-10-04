@@ -1,0 +1,11 @@
+(a) u0=0.8, G=16: mean Delta u = -3.01e-05 +- 2.6e-04 (SE); Var = 0.01338 vs 4h^2r^2p(1-p)/G = 0.01337
+(b) first passage to max p >= 0.98, h=0.5, r=1 (time units):
+     G | formula mean | MC mean (SE)      | MC median | report median (80 seeds, censored)
+     4 |          249 |      265 (   4)  |       210 | 177   (uncensored 100.0%)
+     8 |          497 |      508 (   9)  |       402 | 383   (uncensored 100.0%)
+    16 |          995 |     1035 (  17)  |       820 | 654   (uncensored 100.0%)
+    32 |         1989 |     2040 (  34)  |      1535 | 2051   (uncensored 100.0%)
+    64 |         3979 |     4187 (  68)  |      3316 | 3066   (uncensored 100.0%)
+    log-log slope of MC mean vs G = 0.997  (diffusion theory: exactly 1)
+    G=16 with src.dynamics.rhs_sampled (1000 seeds): mean 1009, median 778
+(c) G=4, h=0.5, 400 seeds, 200000 steps: seeds that switched winner at least once: 51.7%; mean switches per seed 1.12; time share with max p >= 0.95 in 2nd half: 99.9%

@@ -1,0 +1,13 @@
+=== python3 next_phase/case3/run_replay.py --suite variants --workers 7 (20:44:56)
+suite variants: 16 configurations, 16 to run, 7 workers
+  [   330s] all_A_ctr_plain_a0.5_G16_J0.1: 330s, frac(max p > 0.95) = 0.00
+  [   485s] all_A_ctr_plain_a0.5_G64_J0.1: 484s, frac(max p > 0.95) = 0.00
+  [   491s] all_A_ctr_plain_a1_G64_J0.1: 491s, frac(max p > 0.95) = 0.00
+  [   521s] all_A_ctr_plain_a2_G64_J0.1: 521s, frac(max p > 0.95) = 0.00
+  [   636s] all_A_click_grpo_a1_G64_J0.1: 636s, frac(max p > 0.95) = 0.00
+  [   652s] all_A_click_grpo_a2_G64_J0.1: 652s, frac(max p > 0.95) = 0.00
+  [   668s] all_A_click_grpo_a0.5_G64_J0.1: 668s, frac(max p > 0.95) = 0.00
+  [   704s] all_A_click_grpo_a0.5_G16_J0.1: 373s, frac(max p > 0.95) = 0.00
+  [   732s] all_A_ctr_plain_a0_G64_J0.1: 80s, frac(max p > 0.95) = 1.00
+  [   753s] all_A_ctr_plain_a0_G16_J0.1: 49s, frac(max p > 0.95) = 1.00
+  [   766s] all_A_ctr_plain_a1_G16_J0.1: 282s, frac(max p > 0.95) = 0.00
